@@ -17,7 +17,6 @@ on:
 env:
   TF_VERSION: "1.6.6"
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
-  TF_LOG: INFO
 
 permissions:
   contents: read
@@ -25,12 +24,12 @@ permissions:
 jobs:
   bootstrap-apply:
 
-    name: Bootstrap Infrastructure
+    name: Bootstrap Azure Infrastructure
 
-    runs-on:
-      - self-hosted
-      - Windows
-      - X64
+    # IMPORTANT:
+    # Use GitHub-hosted runner for bootstrap.
+    # Self-hosted runners do not exist yet.
+    runs-on: ubuntu-latest
 
     timeout-minutes: 90
 
@@ -38,7 +37,7 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh
+        shell: bash
 
     steps:
 
@@ -77,8 +76,8 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          terraform init `
-            -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
+          terraform init \
+            -backend-config="environments/${ENVIRONMENT}/backend.hcl"
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -105,8 +104,8 @@ jobs:
           TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
 
         run: |
-          terraform plan `
-            -var-file="environments/${env:ENVIRONMENT}/terraform.tfvars" `
+          terraform plan \
+            -var-file="environments/${ENVIRONMENT}/terraform.tfvars" \
             -out=tfplan
 
       - name: Upload Terraform Plan
