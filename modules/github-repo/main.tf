@@ -7,7 +7,7 @@ resource "github_repository" "this" {
   has_wiki        = false
   has_projects    = false
   auto_init        = true
-  vulnerability_alerts = true
+  # vulnerability_alerts = true
 
   delete_branch_on_merge = true
 

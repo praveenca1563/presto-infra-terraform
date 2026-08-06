@@ -35,11 +35,15 @@ resource "azurerm_role_assignment" "secrets_user" {
   principal_id          = each.value
 }
 
-resource "azurerm_key_vault_secret" "secrets" {
-  for_each = var.secrets
+locals {
+  secret_names = toset(keys(nonsensitive(var.secrets)))
+}
 
-  name         = each.key
-  value         = each.value
+resource "azurerm_key_vault_secret" "secrets" {
+  for_each = local.secret_names
+
+  name         = each.value
+  value        = var.secrets[each.value]
   key_vault_id = azurerm_key_vault.this.id
 
   depends_on = [azurerm_role_assignment.admin]
