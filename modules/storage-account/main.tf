@@ -1,12 +1,12 @@
 resource "azurerm_storage_account" "this" {
-  name                     = var.storage_account_name
-  resource_group_name     = var.resource_group_name
-  location                = var.location
-  account_tier             = var.account_tier
-  account_replication_type = var.replication_type
-  account_kind             = "StorageV2"
-  is_hns_enabled            = true # required for ADLS Gen2
-  min_tls_version           = "TLS1_2"
+  name                          = var.storage_account_name
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  account_tier                  = var.account_tier
+  account_replication_type      = var.replication_type
+  account_kind                  = "StorageV2"
+  is_hns_enabled                = true # required for ADLS Gen2
+  min_tls_version               = "TLS1_2"
   public_network_access_enabled = var.public_network_access_enabled
 
   network_rules {
@@ -31,7 +31,7 @@ resource "azurerm_storage_container" "containers" {
   for_each = toset(var.containers)
 
   name                  = each.value
-  storage_account_name = azurerm_storage_account.this.name
+  storage_account_name  = azurerm_storage_account.this.name
   container_access_type = "private"
 }
 
@@ -41,7 +41,7 @@ resource "azurerm_storage_blob" "folders" {
   for_each = { for f in var.folders : "${f.container}/${f.path}" => f }
 
   name                   = "${each.value.path}/.keep"
-  storage_account_name  = azurerm_storage_account.this.name
+  storage_account_name   = azurerm_storage_account.this.name
   storage_container_name = each.value.container
   type                   = "Block"
   source_content         = ""

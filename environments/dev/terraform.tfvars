@@ -3,7 +3,7 @@
 ############################################################
 
 environment = "dev"
-location    = "canadacentral"
+location    = "Canada Central"
 
 common_tags = {
   project     = "presto-dataeng"
@@ -43,30 +43,26 @@ data_rg_key  = "data"
 ############################################################
 
 vnet_name          = "prs-dataeng-cc-core-vnet"
-vnet_address_space = ["172.19.204.0/22"]
-
-# Existing route table managed by the networking team
-create_route_table = false
 
 subnets = {
 
   databricks_public = {
-   name             = "prs-dataeng-cc-core-databricks-public-snet"
-   nsg_name         = "prs-dataeng-cc-core-databricks-public-nsg"
-   route_table_name = "prs-dataeng-cc-core-udr"
-}
+    name             = "prs-dataeng-cc-core-databricks-public-snet"
+    nsg_name         = "prs-dataeng-cc-core-databricks-public-nsg"
+    route_table_name = "prs-dataeng-cc-core-udr"
+  }
 
   databricks_private = {
-   name             = "prs-dataeng-cc-core-databricks-private-snet"
-   nsg_name         = "prs-dataeng-cc-core-databricks-private-nsg"
-   route_table_name = "prs-dataeng-cc-core-udr"
-}
+    name             = "prs-dataeng-cc-core-databricks-private-snet"
+    nsg_name         = "prs-dataeng-cc-core-databricks-private-nsg"
+    route_table_name = "prs-dataeng-cc-core-udr"
+  }
 
   data = {
-   name             = "prs-dataeng-cc-core-data-snet"
-   nsg_name         = "prs-dataeng-cc-core-data-nsg"
-   route_table_name = "prs-dataeng-cc-core-udr"
-}
+    name             = "prs-dataeng-cc-core-data-snet"
+    nsg_name         = "prs-dataeng-cc-core-data-nsg"
+    route_table_name = "prs-dataeng-cc-core-udr"
+  }
 
 }
 

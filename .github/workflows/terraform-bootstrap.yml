@@ -17,19 +17,21 @@ on:
 env:
   TF_VERSION: "1.6.6"
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+  TF_IN_AUTOMATION: "true"
 
 permissions:
   contents: read
 
 jobs:
+
   bootstrap-apply:
 
     name: Bootstrap Azure Infrastructure
 
-    # IMPORTANT:
-    # Use GitHub-hosted runner for bootstrap.
-    # Self-hosted runners do not exist yet.
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - Windows
+      - X64
 
     timeout-minutes: 90
 
@@ -37,104 +39,211 @@ jobs:
 
     defaults:
       run:
-        shell: bash
+        shell: pwsh
 
     steps:
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    ###########################################################
+    # Checkout
+    ###########################################################
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Cache Terraform
-        uses: actions/cache@v4
-        with:
-          path: |
-            .terraform
-          key: terraform-${{ runner.os }}-${{ hashFiles('**/*.tf', '**/.terraform.lock.hcl') }}
-          restore-keys: |
-            terraform-${{ runner.os }}-
+    ###########################################################
+    # Setup Terraform
+    ###########################################################
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: |
-            {
-              "clientId":"${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",
-              "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-              "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
-            }
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Terraform Init
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: |
-          terraform init \
-            -backend-config="environments/${ENVIRONMENT}/backend.hcl"
+    ###########################################################
+    # Verify Runner
+    ###########################################################
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+    - name: Verify Runner Environment
+      run: |
 
-      - name: Terraform Validate
-        run: terraform validate
+        Write-Host "===================================="
+        Write-Host "GitHub Runner Information"
+        Write-Host "===================================="
 
-      - name: Terraform Plan
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        Write-Host "Runner Name : $env:RUNNER_NAME"
+        Write-Host "Runner OS   : $env:RUNNER_OS"
+        Write-Host "Runner Arch : $env:RUNNER_ARCH"
+        Write-Host "Machine     : $env:COMPUTERNAME"
 
-          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        Write-Host ""
 
-          TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+        Write-Host "PowerShell Version"
+        $PSVersionTable.PSVersion
 
-          TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-          TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+        Write-Host ""
 
-        run: |
-          terraform plan \
-            -var-file="environments/${ENVIRONMENT}/terraform.tfvars" \
-            -out=tfplan
+        Write-Host "Terraform Version"
+        terraform version
 
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v4
-        with:
-          name: bootstrap-plan-${{ env.ENVIRONMENT }}
-          path: tfplan
-          retention-days: 5
+        Write-Host ""
 
-      - name: Terraform Apply
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        Write-Host "Azure CLI Version"
+        az version
 
-          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        Write-Host ""
 
-          TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+        Write-Host "Git Version"
+        git --version
 
-          TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-          TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+        Write-Host ""
 
-        run: |
-          terraform apply -auto-approve tfplan
+        Write-Host "Current Directory"
+        Get-Location
 
-      - name: Terraform Output
-        run: terraform output
+    ###########################################################
+    # Cache Terraform
+    ###########################################################
+
+    - name: Cache Terraform
+      uses: actions/cache@v4
+      with:
+        path: |
+          .terraform
+        key: terraform-${{ runner.os }}-${{ hashFiles('**/*.tf','**/.terraform.lock.hcl') }}
+        restore-keys: |
+          terraform-${{ runner.os }}-
+
+    ###########################################################
+    # Azure Login
+    ###########################################################
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: |
+          {
+            "clientId":"${{ secrets.AZURE_CLIENT_ID }}",
+            "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",
+            "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+            "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
+          }
+
+    ###########################################################
+    # Verify Azure Login
+    ###########################################################
+
+    - name: Verify Azure Login
+      run: |
+
+        Write-Host "===================================="
+        Write-Host "Azure Account"
+        Write-Host "===================================="
+
+        az account show
+
+    ###########################################################
+    # Terraform Init
+    ###########################################################
+
+    - name: Terraform Init
+
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+      run: |
+
+        terraform init `
+          -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
+
+    ###########################################################
+    # Terraform Format
+    ###########################################################
+
+    - name: Terraform Format Check
+      run: terraform fmt -check -recursive
+
+    ###########################################################
+    # Terraform Validate
+    ###########################################################
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    ###########################################################
+    # Terraform Plan
+    ###########################################################
+
+    - name: Terraform Plan
+
+      env:
+
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+        TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+        TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+        TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+        TF_VAR_github_owner: ${{ github.repository_owner }}
+        TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+
+        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
+        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+
+      run: |
+
+        terraform plan `
+          -var-file="environments/${env:ENVIRONMENT}/terraform.tfvars" `
+          -out=tfplan
+
+    ###########################################################
+    # Upload Plan
+    ###########################################################
+
+    - name: Upload Terraform Plan
+      uses: actions/upload-artifact@v4
+      with:
+        name: bootstrap-plan-${{ env.ENVIRONMENT }}
+        path: tfplan
+        retention-days: 5
+
+    ###########################################################
+    # Terraform Apply
+    ###########################################################
+
+    - name: Terraform Apply
+
+      env:
+
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+        TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+        TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+        TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+        TF_VAR_github_owner: ${{ github.repository_owner }}
+        TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+
+        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
+        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+
+      run: |
+
+        terraform apply -auto-approve tfplan
+
+    ###########################################################
+    # Terraform Outputs
+    ###########################################################
+
+    - name: Terraform Output
+      run: terraform output

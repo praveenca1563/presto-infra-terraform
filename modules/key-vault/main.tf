@@ -1,18 +1,18 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "this" {
-  name                       = var.key_vault_name
-  location                   = var.location
-  resource_group_name       = var.resource_group_name
-  tenant_id                  = var.tenant_id
-  sku_name                    = var.sku_name
-  purge_protection_enabled    = var.purge_protection_enabled
-  soft_delete_retention_days  = var.soft_delete_retention_days
+  name                          = var.key_vault_name
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  tenant_id                     = var.tenant_id
+  sku_name                      = var.sku_name
+  purge_protection_enabled      = var.purge_protection_enabled
+  soft_delete_retention_days    = var.soft_delete_retention_days
   public_network_access_enabled = var.public_network_access_enabled
 
   network_acls {
     default_action             = var.network_default_action
-    bypass                      = "AzureServices"
+    bypass                     = "AzureServices"
     virtual_network_subnet_ids = var.allowed_subnet_ids
   }
 
@@ -24,7 +24,7 @@ resource "azurerm_role_assignment" "admin" {
 
   scope                = azurerm_key_vault.this.id
   role_definition_name = "Key Vault Administrator"
-  principal_id          = each.value
+  principal_id         = each.value
 }
 
 resource "azurerm_role_assignment" "secrets_user" {
@@ -32,7 +32,7 @@ resource "azurerm_role_assignment" "secrets_user" {
 
   scope                = azurerm_key_vault.this.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id          = each.value
+  principal_id         = each.value
 }
 
 locals {

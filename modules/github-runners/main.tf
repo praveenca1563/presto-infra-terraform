@@ -1,12 +1,12 @@
 locals {
   cloud_init = templatefile("${path.module}/templates/runner-init.sh.tpl", {
-    github_owner        = var.github_owner
-    github_repo          = var.github_repo
-    runner_version       = var.runner_version
-    runner_labels         = join(",", var.runner_labels)
-    runner_group          = var.runner_group
-    registration_token    = var.runner_registration_token
-    runners_per_vm         = var.runners_per_vm
+    github_owner       = var.github_owner
+    github_repo        = var.github_repo
+    runner_version     = var.runner_version
+    runner_labels      = join(",", var.runner_labels)
+    runner_group       = var.runner_group
+    registration_token = var.runner_registration_token
+    runners_per_vm     = var.runners_per_vm
   })
 }
 
@@ -21,9 +21,9 @@ resource "azurerm_linux_virtual_machine_scale_set" "runners" {
   name                = var.vmss_name
   resource_group_name = var.resource_group_name
   location            = var.location
-  sku                  = var.vm_size
-  instances            = var.instance_count
-  admin_username       = var.admin_username
+  sku                 = var.vm_size
+  instances           = var.instance_count
+  admin_username      = var.admin_username
 
   # Password auth is disabled; access is via Azure AD / SSH key only.
   disable_password_authentication = true
@@ -42,7 +42,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "runners" {
 
   os_disk {
     storage_account_type = var.os_disk_type
-    caching                = "ReadWrite"
+    caching              = "ReadWrite"
   }
 
   network_interface {
@@ -74,7 +74,7 @@ resource "azurerm_monitor_autoscale_setting" "runners" {
   name                = "${var.vmss_name}-autoscale"
   resource_group_name = var.resource_group_name
   location            = var.location
-  target_resource_id = azurerm_linux_virtual_machine_scale_set.runners.id
+  target_resource_id  = azurerm_linux_virtual_machine_scale_set.runners.id
 
   profile {
     name = "default"
@@ -89,12 +89,12 @@ resource "azurerm_monitor_autoscale_setting" "runners" {
       metric_trigger {
         metric_name        = "Percentage CPU"
         metric_resource_id = azurerm_linux_virtual_machine_scale_set.runners.id
-        time_grain          = "PT1M"
-        statistic           = "Average"
-        time_window         = "PT5M"
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
         time_aggregation   = "Average"
-        operator             = "GreaterThan"
-        threshold            = var.scale_out_cpu_threshold
+        operator           = "GreaterThan"
+        threshold          = var.scale_out_cpu_threshold
       }
       scale_action {
         direction = "Increase"
@@ -108,12 +108,12 @@ resource "azurerm_monitor_autoscale_setting" "runners" {
       metric_trigger {
         metric_name        = "Percentage CPU"
         metric_resource_id = azurerm_linux_virtual_machine_scale_set.runners.id
-        time_grain          = "PT1M"
-        statistic           = "Average"
-        time_window         = "PT10M"
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT10M"
         time_aggregation   = "Average"
-        operator             = "LessThan"
-        threshold            = var.scale_in_cpu_threshold
+        operator           = "LessThan"
+        threshold          = var.scale_in_cpu_threshold
       }
       scale_action {
         direction = "Decrease"

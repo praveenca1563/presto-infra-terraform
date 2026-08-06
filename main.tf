@@ -32,14 +32,11 @@ module "resource_groups" {
 module "networking" {
   source = "./modules/networking"
 
-  vnet_name            = var.vnet_name
-  vnet_address_space   = var.vnet_address_space
-  location             = var.location
-  resource_group_name  = module.resource_groups.resource_group_names[var.infra_rg_key]
-  create_route_table   = var.create_route_table
-  subnets              = var.subnets
+  vnet_name           = var.vnet_name
+  resource_group_name = module.resource_groups.resource_group_names[var.infra_rg_key]
+  subnets             = var.subnets
 
-  tags = local.common_tags
+  tags = var.common_tags
 }
 
 ############################################################
@@ -49,13 +46,13 @@ module "networking" {
 module "key_vault" {
   source = "./modules/key-vault"
 
-  key_vault_name               = var.key_vault_name
-  resource_group_name          = module.resource_groups.resource_group_names[var.infra_rg_key]
-  location                     = var.location
-  tenant_id                    = var.azure_tenant_id
-  allowed_subnet_ids           = [module.networking.subnet_ids[var.data_subnet_key]]
-  admin_object_ids             = var.key_vault_admin_object_ids
-  secrets_reader_object_ids    = var.key_vault_secrets_reader_object_ids
+  key_vault_name            = var.key_vault_name
+  resource_group_name       = module.resource_groups.resource_group_names[var.infra_rg_key]
+  location                  = var.location
+  tenant_id                 = var.azure_tenant_id
+  allowed_subnet_ids        = [module.networking.subnet_ids[var.data_subnet_key]]
+  admin_object_ids          = var.key_vault_admin_object_ids
+  secrets_reader_object_ids = var.key_vault_secrets_reader_object_ids
 
   tags = local.common_tags
 }
@@ -92,14 +89,14 @@ module "storage_account" {
 module "data_factory" {
   source = "./modules/data-factory"
 
-  data_factory_name             = var.data_factory_name
-  resource_group_name           = module.resource_groups.resource_group_names[var.data_rg_key]
-  location                      = var.location
-  public_network_enabled        = var.adf_public_network_enabled
-  storage_account_id            = module.storage_account.storage_account_id
+  data_factory_name      = var.data_factory_name
+  resource_group_name    = module.resource_groups.resource_group_names[var.data_rg_key]
+  location               = var.location
+  public_network_enabled = var.adf_public_network_enabled
+  storage_account_id     = module.storage_account.storage_account_id
 
-  contributor_group_object_ids  = var.adf_contributor_group_object_ids
-  reader_group_object_ids       = var.adf_reader_group_object_ids
+  contributor_group_object_ids = var.adf_contributor_group_object_ids
+  reader_group_object_ids      = var.adf_reader_group_object_ids
 
   tags = local.common_tags
 }
@@ -111,17 +108,17 @@ module "data_factory" {
 module "databricks" {
   source = "./modules/databricks"
 
-  workspace_name                = var.databricks_workspace_name
-  resource_group_name           = module.resource_groups.resource_group_names[var.data_rg_key]
-  location                      = var.location
-  sku                           = var.databricks_sku
-  managed_resource_group_name   = var.databricks_managed_rg_name
+  workspace_name              = var.databricks_workspace_name
+  resource_group_name         = module.resource_groups.resource_group_names[var.data_rg_key]
+  location                    = var.location
+  sku                         = var.databricks_sku
+  managed_resource_group_name = var.databricks_managed_rg_name
 
   enable_vnet_injection = true
 
-  vnet_id                       = module.networking.vnet_id
-  public_subnet_name            = module.networking.subnet_names[var.databricks_public_subnet_key]
-  private_subnet_name           = module.networking.subnet_names[var.databricks_private_subnet_key]
+  vnet_id             = module.networking.vnet_id
+  public_subnet_name  = module.networking.subnet_names[var.databricks_public_subnet_key]
+  private_subnet_name = module.networking.subnet_names[var.databricks_private_subnet_key]
 
   public_subnet_nsg_association_id  = module.networking.nsg_ids[var.databricks_public_subnet_key]
   private_subnet_nsg_association_id = module.networking.nsg_ids[var.databricks_private_subnet_key]
@@ -138,15 +135,15 @@ module "databricks" {
 module "github_repo" {
   source = "./modules/github-repo"
 
-  repository_name                    = var.repository_name
-  repository_description             = var.repository_description
-  visibility                         = var.repository_visibility
-  required_approving_review_count    = var.required_approving_review_count
+  repository_name                 = var.repository_name
+  repository_description          = var.repository_description
+  visibility                      = var.repository_visibility
+  required_approving_review_count = var.required_approving_review_count
 
-  azure_client_id                    = var.azure_client_id
-  azure_tenant_id                    = var.azure_tenant_id
-  azure_subscription_id              = var.azure_subscription_id
-  azure_client_secret                = var.azure_client_secret
+  azure_client_id       = var.azure_client_id
+  azure_tenant_id       = var.azure_tenant_id
+  azure_subscription_id = var.azure_subscription_id
+  azure_client_secret   = var.azure_client_secret
 
   runner_registration_token = var.enable_github_runners ? var.runner_registration_token : null
 }

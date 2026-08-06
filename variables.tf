@@ -118,14 +118,6 @@ variable "vnet_name" {
   type = string
 }
 
-variable "vnet_address_space" {
-  type = list(string)
-}
-
-variable "create_route_table" {
-  type    = bool
-  default = false
-}
 
 variable "subnets" {
   description = "Existing Azure subnets to be used by the platform."
@@ -359,9 +351,9 @@ variable "runner_autoscale_min" {
   default = 1
 
   validation {
-  condition     = var.runner_autoscale_min >= 1
-  error_message = "Minimum runner count must be at least 1."
-}
+    condition     = var.runner_autoscale_min >= 1
+    error_message = "Minimum runner count must be at least 1."
+  }
 }
 
 variable "runner_autoscale_max" {
@@ -369,7 +361,7 @@ variable "runner_autoscale_max" {
   default = 5
 
   validation {
-  condition     = var.runner_autoscale_max >= var.runner_autoscale_min
-  error_message = "Maximum runner count must be greater than or equal to the minimum."
-}
+    condition     = var.runner_autoscale_max >= var.runner_autoscale_min
+    error_message = "Maximum runner count must be greater than or equal to the minimum."
+  }
 }
