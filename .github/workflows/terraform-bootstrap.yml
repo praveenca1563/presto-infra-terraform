@@ -1,0 +1,54 @@
+# One-time bootstrap: run this manually (workflow_dispatch) for the very first
+# apply, since the self-hosted runners referenced in terraform.yml don't exist
+# yet until this apply creates them. After that, terraform.yml's self-hosted
+# jobs take over for all subsequent plan/apply runs.
+name: Terraform Bootstrap (GitHub-hosted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to target"
+        required: true
+        default: "dev"
+
+env:
+  TF_VERSION: "1.6.6"
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+
+jobs:
+  bootstrap-apply:
+    name: bootstrap-apply
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config="environments/${ENVIRONMENT}/backend.hcl"
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve \
+            -var-file="environments/${ENVIRONMENT}/terraform.tfvars"
+        env:
+          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TF_VAR_github_owner: ${{ github.repository_owner }}
+          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+          TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
+          TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
