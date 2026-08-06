@@ -1,24 +1,32 @@
 terraform {
-  required_version = ">= 1.6.0"
+
+  required_version = ">= 1.6.6"
 
   required_providers {
+
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.110"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.53"
-    }
+
     github = {
       source  = "integrations/github"
-      version = "~> 6.2"
+      version = "~> 6.4"
     }
-  }
 
-  backend "azurerm" {
-    # Values intentionally omitted here — supplied at `terraform init`
-    # time via -backend-config=environments/<env>/backend.hcl so the
-    # backend itself is not hardcoded either. See README.md.
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
   }
 }

@@ -4,10 +4,15 @@
 ############################
 
 variable "azure_subscription_id" {
-  type      = string
-  sensitive = true
-}
+  description = "Azure Subscription ID."
+  type        = string
+  sensitive   = true
 
+  validation {
+    condition     = length(var.azure_subscription_id) > 0
+    error_message = "Azure Subscription ID cannot be empty."
+  }
+}
 variable "azure_tenant_id" {
   type      = string
   sensitive = true
@@ -39,13 +44,43 @@ variable "github_token" {
 ############################
 
 variable "environment" {
-  description = "Environment name, e.g. dev / nonprod / prod"
+  description = "Deployment environment."
   type        = string
+
+  validation {
+    condition = contains(
+      ["dev", "qa", "uat", "nonprod", "prod"],
+      lower(var.environment)
+    )
+
+    error_message = "Environment must be one of: dev, qa, uat, nonprod or prod."
+  }
 }
 
 variable "location" {
-  description = "Azure region, e.g. canadacentral"
-  type        = string
+  description = "Azure region."
+
+  type = string
+
+  validation {
+
+    condition = contains([
+      "East US",
+      "East US 2",
+      "Central US",
+      "West US",
+      "West US 2",
+      "Canada Central",
+      "Canada East",
+      "North Europe",
+      "West Europe",
+      "Southeast Asia",
+      "Australia East"
+    ], var.location)
+
+    error_message = "Unsupported Azure region."
+
+  }
 }
 
 variable "common_tags" {
@@ -93,27 +128,12 @@ variable "create_route_table" {
 }
 
 variable "subnets" {
+  description = "Existing Azure subnets to be used by the platform."
+
   type = map(object({
     name             = string
-    address_prefixes = list(string)
     nsg_name         = string
     route_table_name = optional(string)
-    nsg_rules = optional(list(object({
-      name                        = string
-      priority                    = number
-      direction                   = string
-      access                      = string
-      protocol                    = string
-      source_port_range           = optional(string)
-      destination_port_range      = optional(string)
-      source_address_prefix       = optional(string)
-      destination_address_prefix  = optional(string)
-    })), [])
-    delegation = optional(object({
-      name         = string
-      service_name = string
-      actions      = list(string)
-    }))
   }))
 }
 
@@ -137,7 +157,23 @@ variable "data_subnet_key" {
 ############################
 
 variable "storage_account_name" {
+
+  description = "Azure Storage Account name."
+
   type = string
+
+  validation {
+
+    condition = (
+      length(var.storage_account_name) >= 3 &&
+      length(var.storage_account_name) <= 24 &&
+      can(regex("^[a-z0-9]+$", var.storage_account_name))
+    )
+
+    error_message = "Storage account names must be 3-24 lowercase alphanumeric characters."
+
+  }
+
 }
 
 variable "storage_containers" {
@@ -194,8 +230,21 @@ variable "databricks_managed_rg_name" {
 }
 
 variable "databricks_sku" {
+
   type    = string
   default = "premium"
+
+  validation {
+
+    condition = contains(
+      ["standard", "premium"],
+      lower(var.databricks_sku)
+    )
+
+    error_message = "Databricks SKU must be Standard or Premium."
+
+  }
+
 }
 
 variable "databricks_metastore_admin_object_ids" {
@@ -235,8 +284,21 @@ variable "repository_description" {
 }
 
 variable "repository_visibility" {
+
   type    = string
   default = "private"
+
+  validation {
+
+    condition = contains(
+      ["private", "public", "internal"],
+      lower(var.repository_visibility)
+    )
+
+    error_message = "Repository visibility must be private, public or internal."
+
+  }
+
 }
 
 variable "required_approving_review_count" {
@@ -264,8 +326,21 @@ variable "runner_vm_size" {
 }
 
 variable "runner_instance_count" {
+
   type    = number
   default = 2
+
+  validation {
+
+    condition = (
+      var.runner_instance_count >= 1 &&
+      var.runner_instance_count <= 20
+    )
+
+    error_message = "Runner count must be between 1 and 20."
+
+  }
+
 }
 
 variable "runner_ssh_public_key" {
@@ -282,9 +357,19 @@ variable "runner_registration_token" {
 variable "runner_autoscale_min" {
   type    = number
   default = 1
+
+  validation {
+  condition     = var.runner_autoscale_min >= 1
+  error_message = "Minimum runner count must be at least 1."
+}
 }
 
 variable "runner_autoscale_max" {
   type    = number
   default = 5
+
+  validation {
+  condition     = var.runner_autoscale_max >= var.runner_autoscale_min
+  error_message = "Maximum runner count must be greater than or equal to the minimum."
+}
 }
