@@ -67,3 +67,8 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+variable "no_public_ip" {
+  description = "Enable secure cluster connectivity (No Public IP)"
+  type        = bool
+  default     = true
+}
