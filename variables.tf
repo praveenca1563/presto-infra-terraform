@@ -105,11 +105,6 @@ variable "resource_groups" {
   }))
 }
 
-variable "infra_rg_key" {
-  description = "Key (from resource_groups map) of the RG that holds networking/keyvault/runner infra"
-  type        = string
-}
-
 variable "data_rg_key" {
   description = "Key (from resource_groups map) of the RG that holds ADF/storage/Databricks"
   type        = string
@@ -385,4 +380,9 @@ variable "runner_autoscale_max" {
   type    = number
   default = 5
 
+}
+
+variable "existing_infra_resource_group_name" {
+  description = "Existing Infrastructure Resource Group"
+  type        = string
 }

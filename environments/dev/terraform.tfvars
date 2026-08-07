@@ -16,14 +16,6 @@ common_tags = {
 ############################################################
 
 resource_groups = {
-  infra = {
-    name     = "prs-dataeng-cc-infra-rg"
-    location = "canadacentral"
-
-    tags = {
-      workload = "infrastructure"
-    }
-  }
 
   data = {
     name     = "rg-presto-dev-de"
@@ -35,8 +27,8 @@ resource_groups = {
   }
 }
 
-infra_rg_key = "infra"
 data_rg_key  = "data"
+existing_infra_resource_group_name = "prs-dataeng-cc-infra-rg"
 
 ############################################################
 # Networking

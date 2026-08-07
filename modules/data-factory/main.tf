@@ -15,7 +15,7 @@ resource "azurerm_data_factory" "this" {
 
 # Grants the ADF System Assigned Managed Identity access to the data lake.
 resource "azurerm_role_assignment" "adf_storage_contributor" {
-  count = var.storage_account_id != null ? 1 : 0
+  count = 1
 
   scope                = var.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
@@ -23,7 +23,7 @@ resource "azurerm_role_assignment" "adf_storage_contributor" {
 }
 
 resource "azurerm_role_assignment" "adf_storage_reader" {
-  count = var.storage_account_id != null ? 1 : 0
+  count = 1
 
   scope                = var.storage_account_id
   role_definition_name = "Reader"

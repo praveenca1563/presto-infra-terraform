@@ -15,6 +15,14 @@ locals {
 }
 
 ############################################################
+# Existing Infrastructure Resource Group
+############################################################
+
+data "azurerm_resource_group" "infra" {
+  name = var.existing_infra_resource_group_name
+}
+
+############################################################
 # Resource Groups
 ############################################################
 
@@ -33,7 +41,7 @@ module "networking" {
   source = "./modules/networking"
 
   vnet_name           = var.vnet_name
-  resource_group_name = module.resource_groups.resource_group_names[var.infra_rg_key]
+  resource_group_name = data.azurerm_resource_group.infra.name
   subnets             = var.subnets
 
   tags = var.common_tags
@@ -47,7 +55,7 @@ module "key_vault" {
   source = "./modules/key-vault"
 
   key_vault_name            = var.key_vault_name
-  resource_group_name       = module.resource_groups.resource_group_names[var.infra_rg_key]
+  resource_group_name = data.azurerm_resource_group.infra.name
   location                  = var.location
   tenant_id                 = var.azure_tenant_id
   allowed_subnet_ids        = [module.networking.subnet_ids[var.data_subnet_key]]
@@ -158,7 +166,7 @@ module "github_runners" {
   count = var.enable_github_runners ? 1 : 0
 
   vmss_name           = var.runner_vmss_name != "" ? var.runner_vmss_name : "${var.repository_name}-runners"
-  resource_group_name = module.resource_groups.resource_group_names[var.infra_rg_key]
+  resource_group_name = data.azurerm_resource_group.infra.name
   location            = var.location
   identity_name       = "${var.repository_name}-runner-identity"
 
