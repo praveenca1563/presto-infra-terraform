@@ -51,7 +51,7 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh
+        shell: powershell
 
     permissions:
       contents: read
@@ -169,7 +169,7 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh
+        shell: powershell
 
     permissions:
       contents: read
