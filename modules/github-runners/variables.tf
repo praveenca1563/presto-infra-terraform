@@ -16,7 +16,7 @@ variable "identity_name" {
 
 variable "vm_size" {
   type    = string
-  default = "Standard_D2s_v5"
+  default = "Standard_B2ps_v2"
 }
 
 variable "instance_count" {

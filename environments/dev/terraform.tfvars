@@ -137,7 +137,7 @@ enable_github_runners = true
 
 runner_vmss_name = "prs-dataeng-gh-runners"
 
-runner_vm_size = "Standard_D2s_v5"
+runner_vm_size = "Standard_B2ps_v2"
 
 # Increase if you expect parallel Terraform deployments.
 runner_instance_count = 2
