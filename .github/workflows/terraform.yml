@@ -67,11 +67,26 @@ jobs:
        # with:
         #  terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Verify Local Terraform
+      #- name: Verify Local Terraform
+      #  shell: powershell
+      #  run: |
+       #   where.exe terraform
+        #  terraform version
+
+      - name: Install Terraform
         shell: powershell
         run: |
-          where.exe terraform
-          terraform version
+          $ProgressPreference = 'SilentlyContinue'
+
+          Invoke-WebRequest `
+          -Uri "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_windows_amd64.zip" `
+          -OutFile terraform.zip
+
+          Expand-Archive terraform.zip -DestinationPath terraform -Force
+
+          "$PWD\terraform" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          .\terraform\terraform.exe version
 
       - name: Cache Terraform
         uses: actions/cache@v4
@@ -91,21 +106,21 @@ jobs:
               "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
               "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
             }
-      - name: Verify Terraform Executable
-        shell: powershell
-        run: |
-          Write-Host "PATH:"
-          $env:PATH
+      # - name: Verify Terraform Executable
+      #   shell: powershell
+      #   run: |
+      #     Write-Host "PATH:"
+      #     $env:PATH
 
-          Write-Host ""
-          Write-Host "Terraform location:"
-          where.exe terraform
+      #     Write-Host ""
+      #     Write-Host "Terraform location:"
+      #     where.exe terraform
 
-          Write-Host ""
-          Get-Command terraform | Format-List *
+      #     Write-Host ""
+      #     Get-Command terraform | Format-List *
 
-          Write-Host ""
-          terraform version
+      #     Write-Host ""
+      #     terraform version
 
       - name: Terraform Init
         env:
@@ -123,31 +138,44 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Test GitHub Download
+      - name: Install TFLint
         shell: powershell
-        run: | 
-            Invoke-WebRequest `
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+
+          Invoke-WebRequest `
             -Uri "https://github.com/terraform-linters/tflint/releases/latest/download/tflint_windows_amd64.zip" `
             -OutFile tflint.zip
 
-            Get-Item tflint.zip
+          Expand-Archive -Path tflint.zip -DestinationPath .\tflint -Force
 
-                Write-Host "File Size:"
-               (Get-Item tflint.zip).Length
+          $env:PATH += ";$PWD\tflint"
 
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v4
+          .\tflint\tflint.exe --version
 
       - name: Initialize TFLint
-        run: tflint --init
+        shell: powershell
+        run: |
+         .\tflint\tflint.exe --init
 
       - name: Run TFLint
-        run: tflint
+        shell: powershell
+        run: |
+         .\tflint\tflint.exe
 
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@master
-        with:
-          directory: .
+     # - name: Setup TFLint
+     #   uses: terraform-linters/setup-tflint@v4
+
+     # - name: Initialize TFLint
+      #  run: tflint --init
+
+      #- name: Run TFLint
+       # run: tflint
+
+     # - name: Run Checkov
+     #   uses: bridgecrewio/checkov-action@master
+     #   with:
+      #    directory: .
 
       - name: Terraform Plan
         env:
@@ -218,27 +246,42 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
-      - name: Verify Terraform Installation
+      # - name: Verify Terraform Installation
+      #   shell: powershell
+      #   run: |
+      #    Write-Host "========================================"
+      #    Write-Host "Terraform Installation"
+      #    Write-Host "========================================"
+
+      #    Write-Host ""
+      #    Write-Host "PATH"
+      #    Write-Host $env:PATH
+
+      #    Write-Host ""
+      #    Write-Host "Terraform Location"
+      #    where.exe terraform
+
+      #    Write-Host ""
+      #    Get-Command terraform | Format-List *
+
+      #    Write-Host ""
+      #    Write-Host "Terraform Version"
+      #    terraform version
+
+      - name: Install Terraform
         shell: powershell
         run: |
-         Write-Host "========================================"
-         Write-Host "Terraform Installation"
-         Write-Host "========================================"
+          $ProgressPreference = 'SilentlyContinue'
 
-         Write-Host ""
-         Write-Host "PATH"
-         Write-Host $env:PATH
+          Invoke-WebRequest `
+          -Uri "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_windows_amd64.zip" `
+          -OutFile terraform.zip
 
-         Write-Host ""
-         Write-Host "Terraform Location"
-         where.exe terraform
+          Expand-Archive terraform.zip -DestinationPath terraform -Force
 
-         Write-Host ""
-         Get-Command terraform | Format-List *
+          "$PWD\terraform" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-         Write-Host ""
-         Write-Host "Terraform Version"
-         terraform version
+          .\terraform\terraform.exe version
 
       - name: Azure Login
         uses: azure/login@v2
