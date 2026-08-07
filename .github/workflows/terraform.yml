@@ -23,7 +23,7 @@ on:
           - prod
 
 env:
-  TF_VERSION: "1.12.1"
+  TF_VERSION: "1.15.8"
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
   TF_LOG: INFO
 
@@ -140,6 +140,7 @@ jobs:
             Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"
           }
       - name: Terraform Init
+        shell: powershell
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
