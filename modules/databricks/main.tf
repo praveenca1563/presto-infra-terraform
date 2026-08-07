@@ -8,6 +8,7 @@ resource "azurerm_databricks_workspace" "this" {
 
   # public_network_access_enabled = var.public_network_access_enabled
   public_network_access_enabled = false
+  network_security_group_rules_required = "NoAzureDatabricksRules"
 
 
   dynamic "custom_parameters" {
