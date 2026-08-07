@@ -43,35 +43,35 @@ resource "github_branch_protection" "main" {
 # Values must be supplied as sensitive TF variables (e.g. via TF_VAR_ env vars
 # in your CI runner or a secure secret store) — never hardcoded or committed.
 resource "github_actions_secret" "azure_client_id" {
-  repository      = github_repository.this.name
-  secret_name     = "AZURE_CLIENT_ID"
-  value           = var.azure_client_id
+  repository  = github_repository.this.name
+  secret_name = "AZURE_CLIENT_ID"
+  value       = var.azure_client_id
 }
 
 resource "github_actions_secret" "azure_tenant_id" {
-  repository      = github_repository.this.name
-  secret_name     = "AZURE_TENANT_ID"
-  value           = var.azure_tenant_id
+  repository  = github_repository.this.name
+  secret_name = "AZURE_TENANT_ID"
+  value       = var.azure_tenant_id
 }
 
 resource "github_actions_secret" "azure_subscription_id" {
-  repository      = github_repository.this.name
-  secret_name     = "AZURE_SUBSCRIPTION_ID"
-  value           = var.azure_subscription_id
+  repository  = github_repository.this.name
+  secret_name = "AZURE_SUBSCRIPTION_ID"
+  value       = var.azure_subscription_id
 }
 
 resource "github_actions_secret" "azure_client_secret" {
   count = var.azure_client_secret != null ? 1 : 0
 
-  repository      = github_repository.this.name
-  secret_name     = "AZURE_CLIENT_SECRET"
-  value           = var.azure_client_secret
+  repository  = github_repository.this.name
+  secret_name = "AZURE_CLIENT_SECRET"
+  value       = var.azure_client_secret
 }
 
 resource "github_actions_secret" "runner_registration_token" {
   count = var.runner_registration_token != null ? 1 : 0
 
-  repository      = github_repository.this.name
-  secret_name     = "RUNNER_REGISTRATION_TOKEN"
-  value           = var.runner_registration_token
+  repository  = github_repository.this.name
+  secret_name = "RUNNER_REGISTRATION_TOKEN"
+  value       = var.runner_registration_token
 }

@@ -42,7 +42,7 @@ data_rg_key  = "data"
 # Networking
 ############################################################
 
-vnet_name          = "prs-dataeng-cc-core-vnet"
+vnet_name = "prs-dataeng-cc-core-vnet"
 
 subnets = {
 
