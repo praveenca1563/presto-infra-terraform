@@ -213,7 +213,7 @@ module "rbac" {
         scope                = module.data_factory.data_factory_id
         role_definition_name = "Data Factory Contributor"
         principal_id         = id
-      } if trim(id) != ""
+      } if trimspace(id) != ""
     ],
 
     [
@@ -221,7 +221,7 @@ module "rbac" {
         scope                = module.data_factory.data_factory_id
         role_definition_name = "Reader"
         principal_id         = id
-      } if trim(id) != ""
+      } if trimspace(id) != ""
     ],
 
     [
@@ -229,7 +229,7 @@ module "rbac" {
         scope                = module.databricks.workspace_id
         role_definition_name = "Contributor"
         principal_id         = id
-      } if trim(id) != ""
+      } if trimspace(id) != ""
     ],
 
     [
@@ -237,7 +237,7 @@ module "rbac" {
         scope                = module.key_vault.key_vault_id
         role_definition_name = "Key Vault Administrator"
         principal_id         = id
-      } if trim(id) != ""
+      } if trimspace(id) != ""
     ],
 
     [
@@ -245,7 +245,7 @@ module "rbac" {
         scope                = module.key_vault.key_vault_id
         role_definition_name = "Key Vault Secrets User"
         principal_id         = id
-      } if trim(id) != ""
+      } if trimspace(id) != ""
     ],
 
     [
