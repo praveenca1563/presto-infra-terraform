@@ -1,16 +1,22 @@
-resource "azurerm_data_factory" "this" {
-  name                = var.data_factory_name
-  location            = var.location
+resource "azurerm_resource_group_template_deployment" "this" {
+  name                = "${var.data_factory_name}-deployment"
   resource_group_name = var.resource_group_name
+  deployment_mode     = "Incremental"
+  template_content    = file("${path.module}/adf.json")
 
-  identity {
-    type = "SystemAssigned"
-  }
+  parameters_content = jsonencode({
+    factoryName = {
+      value = var.data_factory_name
+    }
 
-  public_network_enabled = var.public_network_enabled
+    location = {
+      value = var.location
+    }
 
-
-  tags = var.tags
+    publicNetworkAccess = {
+      value = var.public_network_enabled ? "Enabled" : "Disabled"
+    }
+  })
 }
 
 # Grants the ADF System Assigned Managed Identity access to the data lake.
@@ -19,7 +25,7 @@ resource "azurerm_role_assignment" "adf_storage_contributor" {
 
   scope                = var.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_data_factory.this.identity[0].principal_id
+  principal_id         = data.data.azurerm_data_factory.this.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "adf_storage_reader" {
@@ -27,14 +33,14 @@ resource "azurerm_role_assignment" "adf_storage_reader" {
 
   scope                = var.storage_account_id
   role_definition_name = "Reader"
-  principal_id         = azurerm_data_factory.this.identity[0].principal_id
+  principal_id         = data.data.azurerm_data_factory.this.identity[0].principal_id
 }
 
 # RBAC on the ADF instance itself for the data engineering AAD group.
 resource "azurerm_role_assignment" "de_group_contributor" {
   for_each = toset(var.contributor_group_object_ids)
 
-  scope                = azurerm_data_factory.this.id
+  scope                = data.azurerm_data_factory.this.id
   role_definition_name = "Data Factory Contributor"
   principal_id         = each.value
 }
@@ -42,7 +48,7 @@ resource "azurerm_role_assignment" "de_group_contributor" {
 resource "azurerm_role_assignment" "de_group_reader" {
   for_each = toset(var.reader_group_object_ids)
 
-  scope                = azurerm_data_factory.this.id
+  scope                = data.azurerm_data_factory.this.id
   role_definition_name = "Reader"
   principal_id         = each.value
 }
