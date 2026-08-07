@@ -24,8 +24,9 @@ variable "replication_type" {
 }
 
 variable "public_network_access_enabled" {
-  type    = bool
-  default = false
+  description = "Enable public network access to the storage account"
+  type        = bool
+  default     = true
 }
 
 variable "network_default_action" {

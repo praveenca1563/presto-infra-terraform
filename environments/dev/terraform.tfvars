@@ -82,7 +82,7 @@ storage_folders = [
   }
 ]
 
-storage_public_network_access_enabled = false
+storage_public_network_access_enabled = true
 
 ############################################################
 # Azure Data Factory
