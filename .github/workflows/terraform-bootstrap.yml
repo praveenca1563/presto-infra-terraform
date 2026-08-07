@@ -58,12 +58,14 @@ jobs:
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: ${{ env.TF_VERSION }}
+        terraform_wrapper: false
 
     ###########################################################
     # Verify Runner
     ###########################################################
 
     - name: Verify Runner Environment
+      shell: powershell
       run: |
 
         Write-Host "===================================="
@@ -76,6 +78,15 @@ jobs:
         Write-Host "Machine     : $env:COMPUTERNAME"
 
         Write-Host ""
+        write-Host "PATH"
+        Writr-Host $env:PATH
+
+        write-Host ""
+        Write-Host "Terraform Location"
+        where.exe terraform
+
+        write-Host ""
+        Get-Command terraform | Format-List *
 
         Write-Host "PowerShell Version"
         $PSVersionTable.PSVersion
@@ -97,7 +108,7 @@ jobs:
 
         Write-Host ""
 
-        Write-Host "Current Directory"
+        Write-Host "Working Directory"
         Get-Location
 
     ###########################################################
