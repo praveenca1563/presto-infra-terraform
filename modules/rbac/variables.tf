@@ -1,10 +1,5 @@
-variable "scope" {
-  description = "Azure resource ID where RBAC will be assigned"
-  type        = string
-}
-
 variable "assignments" {
-  description = "List of Azure RBAC assignments"
+  description = "Azure RBAC assignments"
 
   type = list(object({
     scope                = string
