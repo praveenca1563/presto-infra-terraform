@@ -8,7 +8,7 @@ resource "azurerm_data_factory" "this" {
   }
 
   public_network_enabled = var.public_network_enabled
-  
+
 
   tags = var.tags
 }
