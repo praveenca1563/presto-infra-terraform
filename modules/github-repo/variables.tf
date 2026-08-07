@@ -29,8 +29,9 @@ variable "default_branch" {
 }
 
 variable "enable_branch_protection" {
-  type    = bool
-  default = true
+  description = "Enable GitHub branch protection"
+  type        = bool
+  default     = false
 }
 
 variable "required_approving_review_count" {

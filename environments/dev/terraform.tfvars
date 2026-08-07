@@ -127,6 +127,8 @@ repository_visibility = "private"
 
 required_approving_review_count = 1
 
+enable_branch_protection = false
+
 ############################################################
 # GitHub Self-hosted Runners
 ############################################################

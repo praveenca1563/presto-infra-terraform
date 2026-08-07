@@ -318,6 +318,11 @@ variable "required_approving_review_count" {
   default = 1
 }
 
+variable "enable_branch_protection" {
+  type    = bool
+  default = false
+}
+
 ############################
 # GitHub self-hosted runners
 ############################

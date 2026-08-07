@@ -161,6 +161,7 @@ module "github_repo" {
   azure_client_secret   = var.azure_client_secret
 
   runner_registration_token = var.enable_github_runners ? var.runner_registration_token : null
+  enable_branch_protection  = var.enable_branch_protection
 }
 
 ############################################################
