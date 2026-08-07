@@ -29,4 +29,5 @@ terraform.exe
 
 # Optional local tools
 tools/
-*.zip
+*.zipterraform.log
+*.log

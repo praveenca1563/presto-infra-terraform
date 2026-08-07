@@ -18,6 +18,14 @@ resource "azurerm_resource_group_template_deployment" "this" {
     }
   })
 }
+data "azurerm_data_factory" "this" {
+  name                = var.data_factory_name
+  resource_group_name = var.resource_group_name
+
+  depends_on = [
+    azurerm_resource_group_template_deployment.this
+  ]
+}
 
 # Grants the ADF System Assigned Managed Identity access to the data lake.
 resource "azurerm_role_assignment" "adf_storage_contributor" {
@@ -25,7 +33,7 @@ resource "azurerm_role_assignment" "adf_storage_contributor" {
 
   scope                = var.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.data.azurerm_data_factory.this.identity[0].principal_id
+  principal_id         = data.azurerm_data_factory.this.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "adf_storage_reader" {
@@ -33,7 +41,7 @@ resource "azurerm_role_assignment" "adf_storage_reader" {
 
   scope                = var.storage_account_id
   role_definition_name = "Reader"
-  principal_id         = data.data.azurerm_data_factory.this.identity[0].principal_id
+  principal_id         = data.azurerm_data_factory.this.identity[0].principal_id
 }
 
 # RBAC on the ADF instance itself for the data engineering AAD group.
