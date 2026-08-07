@@ -49,15 +49,3 @@ resource "azurerm_role_assignment" "metastore_admin" {
   ]
 }
 
-module "databricks_rbac" {
-  source = "../rbac"
-
-  scope = module.databricks.workspace_id
-
-  role_assignments = [
-    {
-      role_definition_name = "Contributor"
-      principal_id         = var.databricks_admin_group
-    }
-  ]
-}

@@ -48,15 +48,3 @@ resource "azurerm_key_vault_secret" "secrets" {
 
   depends_on = [azurerm_role_assignment.admin]
 }
-module "keyvault_rbac" {
-  source = "../rbac"
-
-  scope = module.key_vault.key_vault_id
-
-  role_assignments = [
-    {
-      role_definition_name = "Key Vault Secrets Officer"
-      principal_id         = data.azurerm_client_config.current.object_id
-    }
-  ]
-}

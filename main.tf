@@ -206,3 +206,111 @@ module "storage_rbac" {
     }
   ]
 }
+
+############################################################
+# Storage Account RBAC
+############################################################
+
+data "azurerm_client_config" "current" {}
+
+module "storage_rbac" {
+
+  source = "./modules/rbac"
+
+  scope = module.storage_account.storage_account_id
+
+  role_assignments = [
+
+    {
+      role_definition_name = "Storage Blob Data Contributor"
+      principal_id         = data.azurerm_client_config.current.object_id
+    }
+
+  ]
+
+  depends_on = [
+    module.storage_account
+  ]
+}
+
+############################################################
+# Data Factory RBAC
+############################################################
+
+module "adf_rbac" {
+
+  source = "./modules/rbac"
+
+  scope = module.data_factory.data_factory_id
+
+  role_assignments = [
+
+    {
+      role_definition_name = "Data Factory Contributor"
+      principal_id         = var.adf_admin_group_object_id
+    },
+
+    {
+      role_definition_name = "Reader"
+      principal_id         = var.adf_reader_group_object_id
+    }
+
+  ]
+
+  depends_on = [
+    module.data_factory
+  ]
+}
+
+############################################################
+# Databricks RBAC
+############################################################
+
+module "databricks_rbac" {
+
+  source = "./modules/rbac"
+
+  scope = module.databricks.workspace_id
+
+  role_assignments = [
+
+    {
+      role_definition_name = "Contributor"
+      principal_id         = var.databricks_admin_group_object_id
+    }
+
+  ]
+
+  depends_on = [
+    module.databricks
+  ]
+}
+
+############################################################
+# Key Vault RBAC
+############################################################
+
+module "keyvault_rbac" {
+
+  source = "./modules/rbac"
+
+  scope = module.key_vault.key_vault_id
+
+  role_assignments = [
+
+    {
+      role_definition_name = "Key Vault Administrator"
+      principal_id         = var.keyvault_admin_group_object_id
+    },
+
+    {
+      role_definition_name = "Key Vault Secrets Officer"
+      principal_id         = var.keyvault_secret_admin_group_object_id
+    }
+
+  ]
+
+  depends_on = [
+    module.key_vault
+  ]
+}

@@ -386,3 +386,23 @@ variable "existing_infra_resource_group_name" {
   description = "Existing Infrastructure Resource Group"
   type        = string
 }
+
+variable "adf_admin_group_object_id" {
+  type = string
+}
+
+variable "adf_reader_group_object_id" {
+  type = string
+}
+
+variable "databricks_admin_group_object_id" {
+  type = string
+}
+
+variable "keyvault_admin_group_object_id" {
+  type = string
+}
+
+variable "keyvault_secret_admin_group_object_id" {
+  type = string
+}
