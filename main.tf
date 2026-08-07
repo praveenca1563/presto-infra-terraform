@@ -55,7 +55,7 @@ module "key_vault" {
   source = "./modules/key-vault"
 
   key_vault_name            = var.key_vault_name
-  resource_group_name = data.azurerm_resource_group.infra.name
+  resource_group_name       = data.azurerm_resource_group.infra.name
   location                  = var.location
   tenant_id                 = var.azure_tenant_id
   allowed_subnet_ids        = [module.networking.subnet_ids[var.data_subnet_key]]

@@ -27,7 +27,7 @@ resource_groups = {
   }
 }
 
-data_rg_key  = "data"
+data_rg_key                        = "data"
 existing_infra_resource_group_name = "prs-dataeng-cc-infra-rg"
 
 ############################################################
