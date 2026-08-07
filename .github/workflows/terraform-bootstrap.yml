@@ -79,7 +79,7 @@ jobs:
 
         Write-Host ""
         write-Host "PATH"
-        Writr-Host $env:PATH
+        Write-Host $env:PATH
 
         write-Host ""
         Write-Host "Terraform Location"
