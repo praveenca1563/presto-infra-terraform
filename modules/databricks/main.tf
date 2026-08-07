@@ -8,7 +8,7 @@ resource "azurerm_databricks_workspace" "this" {
 
   # public_network_access_enabled = var.public_network_access_enabled
   public_network_access_enabled = false
-  no_public_ip                  = true
+  
 
   dynamic "custom_parameters" {
     for_each = var.enable_vnet_injection ? [1] : []
@@ -19,7 +19,8 @@ resource "azurerm_databricks_workspace" "this" {
       private_subnet_name                                  = var.private_subnet_name
       public_subnet_network_security_group_association_id  = var.public_subnet_nsg_association_id
       private_subnet_network_security_group_association_id = var.private_subnet_nsg_association_id
-      #  no_public_ip                                         = var.no_public_ip
+      #  no_public_ip                                      = var.no_public_ip
+      no_public_ip                                         = true
     }
   }
 
