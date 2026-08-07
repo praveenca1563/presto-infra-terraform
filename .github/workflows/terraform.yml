@@ -62,10 +62,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
+     # - name: Setup Terraform
+      #  uses: hashicorp/setup-terraform@v3
+       # with:
+        #  terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Verify Local Terraform
+        shell: powershell
+        run: |
+          where.exe terraform
+          terraform version
 
       - name: Cache Terraform
         uses: actions/cache@v4
@@ -85,6 +91,21 @@ jobs:
               "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
               "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
             }
+      - name: Verify Terraform Executable
+        shell: powershell
+        run: |
+          Write-Host "PATH:"
+          $env:PATH
+
+          Write-Host ""
+          Write-Host "Terraform location:"
+          where.exe terraform
+
+          Write-Host ""
+          Get-Command terraform | Format-List *
+
+          Write-Host ""
+          terraform version
 
       - name: Terraform Init
         env:
