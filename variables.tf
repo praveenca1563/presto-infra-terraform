@@ -250,6 +250,18 @@ variable "databricks_metastore_admin_object_ids" {
 
 variable "key_vault_name" {
   type = string
+
+  validation {
+
+    condition = (
+      length(var.key_vault_name) >= 3 &&
+      length(var.key_vault_name) <= 24 &&
+      can(regex("^[a-z0-9-]+$", var.key_vault_name))
+    )
+
+    error_message = "Invalid Key Vault name."
+
+  }
 }
 
 variable "key_vault_admin_object_ids" {
@@ -268,6 +280,14 @@ variable "key_vault_secrets_reader_object_ids" {
 
 variable "repository_name" {
   type = string
+
+  validation {
+
+    condition = length(var.repository_name) > 0
+
+    error_message = "Repository name cannot be empty."
+
+  }
 }
 
 variable "repository_description" {
@@ -360,8 +380,14 @@ variable "runner_autoscale_max" {
   type    = number
   default = 5
 
+}
+variable "github_token" {
+  description = "GitHub PAT"
+  type        = string
+  sensitive   = true
+
   validation {
-    condition     = var.runner_autoscale_max >= var.runner_autoscale_min
-    error_message = "Maximum runner count must be greater than or equal to the minimum."
+    condition     = length(var.github_token) > 0
+    error_message = "GitHub token cannot be empty."
   }
 }
