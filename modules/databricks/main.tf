@@ -50,7 +50,7 @@ resource "azurerm_role_assignment" "metastore_admin" {
 }
 
 module "databricks_rbac" {
-  source = "./modules/rbac"
+  source = "../rbac"
 
   scope = module.databricks.workspace_id
 

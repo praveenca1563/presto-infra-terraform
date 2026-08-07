@@ -48,7 +48,7 @@ resource "azurerm_role_assignment" "de_group_reader" {
 }
 
 module "adf_rbac" {
-  source = "./modules/rbac"
+  source = "../rbac"
 
   scope = module.data_factory.data_factory_id
 

@@ -49,7 +49,7 @@ resource "azurerm_key_vault_secret" "secrets" {
   depends_on = [azurerm_role_assignment.admin]
 }
 module "keyvault_rbac" {
-  source = "./modules/rbac"
+  source = "../rbac"
 
   scope = module.key_vault.key_vault_id
 

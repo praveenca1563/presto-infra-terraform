@@ -27,13 +27,6 @@ resource "azurerm_storage_account" "this" {
   tags = var.tags
 }
 
-resource "azurerm_storage_container" "containers" {
-  for_each = toset(var.containers)
-
-  name                  = each.value
-  storage_account_name  = azurerm_storage_account.this.name
-  container_access_type = "private"
-}
 
 # Emulates a "folder" inside a container (e.g. gold/data_management) by writing a
 # zero-byte placeholder blob, since ADLS containers have no native empty-folder concept.
