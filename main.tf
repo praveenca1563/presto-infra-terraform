@@ -191,21 +191,6 @@ module "github_runners" {
   ]
 }
 
-data "azurerm_client_config" "current" {}
-
-module "storage_rbac" {
-
-  source = "./modules/rbac"
-
-  scope = module.storage_account.storage_account_id
-
-  role_assignments = [
-    {
-      role_definition_name = "Storage Blob Data Contributor"
-      principal_id         = data.azurerm_client_config.current.object_id
-    }
-  ]
-}
 
 ############################################################
 # Storage Account RBAC
