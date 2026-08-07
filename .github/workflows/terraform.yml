@@ -93,7 +93,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          terraform init `
+          terraform init 
             -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
 
       - name: Terraform Format
@@ -135,7 +135,7 @@ jobs:
           TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
 
         run: |
-          terraform plan `
+          terraform plan 
             -var-file="environments/${env:ENVIRONMENT}/terraform.tfvars" `
             -out=tfplan
 
@@ -183,6 +183,29 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Verify Terraform Installation
+        shell: powershell
+        run: |
+         Write-Host "========================================"
+         Write-Host "Terraform Installation"
+         Write-Host "========================================"
+
+         Write-Host ""
+         Write-Host "PATH"
+         Write-Host $env:PATH
+
+         Write-Host ""
+         Write-Host "Terraform Location"
+         where.exe terraform
+
+         Write-Host ""
+         Get-Command terraform | Format-List *
+
+         Write-Host ""
+         Write-Host "Terraform Version"
+         terraform version
 
       - name: Azure Login
         uses: azure/login@v2
@@ -196,12 +219,14 @@ jobs:
             }
 
       - name: Terraform Init
+        shell: powershell
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
+          terraform version
           terraform init `
             -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
 
