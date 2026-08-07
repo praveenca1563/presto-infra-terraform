@@ -183,7 +183,7 @@ variable "storage_folders" {
 
 variable "storage_public_network_access_enabled" {
   type    = bool
-  default = false
+  default = true
 }
 
 ############################
@@ -387,10 +387,7 @@ variable "existing_infra_resource_group_name" {
   type        = string
 }
 
-variable "storage_public_network_access_enabled" {
-  type    = bool
-  default = true
-}
+
 
 #variable "adf_admin_group_object_id" {
 #  type = string
