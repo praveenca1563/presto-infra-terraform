@@ -7,7 +7,7 @@ resource "azurerm_databricks_workspace" "this" {
   managed_resource_group_name = var.managed_resource_group_name
 
   # public_network_access_enabled = var.public_network_access_enabled
-  public_network_access_enabled = false
+  public_network_access_enabled         = false
   network_security_group_rules_required = "NoAzureDatabricksRules"
 
 
