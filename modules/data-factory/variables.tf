@@ -17,8 +17,9 @@ variable "public_network_enabled" {
 }
 
 variable "managed_virtual_network_enabled" {
-  type    = bool
-  default = true
+  description = "Enable Managed Virtual Network"
+  type        = bool
+  default     = true
 }
 
 variable "storage_account_id" {

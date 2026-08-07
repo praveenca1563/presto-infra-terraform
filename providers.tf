@@ -21,7 +21,7 @@ provider "azurerm" {
   client_id       = var.azure_client_id
   client_secret   = var.azure_client_secret
 
-  skip_provider_registration = false
+  resource_provider_registrations = "core"
 }
 
 ############################################################
