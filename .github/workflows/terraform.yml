@@ -123,6 +123,18 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Test GitHub Download
+        shell: powershell
+        run: | 
+            Invoke-WebRequest `
+            -Uri "https://github.com/terraform-linters/tflint/releases/latest/download/tflint_windows_amd64.zip" `
+            -OutFile tflint.zip
+
+            Get-Item tflint.zip
+
+                Write-Host "File Size:"
+               (Get-Item tflint.zip).Length
+
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
 
