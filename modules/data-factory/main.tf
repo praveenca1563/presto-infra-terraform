@@ -8,7 +8,7 @@ resource "azurerm_data_factory" "this" {
   }
 
   public_network_enabled          = var.public_network_enabled
-  managed_virtual_network_enabled = var.managed_virtual_network_enabled
+  # managed_virtual_network_enabled = var.managed_virtual_network_enabled
 
   tags = var.tags
 }
