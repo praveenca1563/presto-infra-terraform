@@ -24,3 +24,9 @@ secrets.auto.tfvars
 .DS_Store
 .idea/
 .vscode/
+# Terraform binary
+terraform.exe
+
+# Optional local tools
+tools/
+*.zip

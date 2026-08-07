@@ -121,7 +121,24 @@ jobs:
 
       #     Write-Host ""
       #     terraform version
+      - name: Verify GitHub Variables
+        shell: powershell
+        env:
+          TF_VAR_github_owner: ${{ github.repository_owner }}
+          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+        run: |
+          Write-Host "====================================="
+          Write-Host "GitHub Variables"
+          Write-Host "====================================="
 
+          Write-Host "Owner : $env:TF_VAR_github_owner"
+
+          if ([string]::IsNullOrWhiteSpace($env:TF_VAR_github_token)) {
+            Write-Error "GitHub Token is EMPTY!"
+          }
+          else {
+            Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"
+          }
       - name: Terraform Init
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -206,7 +223,24 @@ jobs:
           name: terraform-plan-${{ env.ENVIRONMENT }}
           path: tfplan
           retention-days: 5
+      - name: Verify GitHub Variables
+        shell: powershell
+        env:
+          TF_VAR_github_owner: ${{ github.repository_owner }}
+          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+        run: |
+          Write-Host "====================================="
+          Write-Host "GitHub Variables"
+          Write-Host "====================================="
 
+          Write-Host "Owner : $env:TF_VAR_github_owner"
+
+          if ([string]::IsNullOrWhiteSpace($env:TF_VAR_github_token)) {
+            Write-Error "GitHub Token is EMPTY!"
+          }
+          else {
+            Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"
+          }
 #################################################################################
 # TERRAFORM APPLY
 #################################################################################

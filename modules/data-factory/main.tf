@@ -46,3 +46,16 @@ resource "azurerm_role_assignment" "de_group_reader" {
   role_definition_name = "Reader"
   principal_id         = each.value
 }
+
+module "adf_rbac" {
+  source = "./modules/rbac"
+
+  scope = module.data_factory.data_factory_id
+
+  role_assignments = [
+    {
+      role_definition_name = "Data Factory Contributor"
+      principal_id         = var.adf_admin_group
+    }
+  ]
+}
