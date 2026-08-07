@@ -37,6 +37,11 @@ variable "github_token" {
   description = "GitHub PAT or GitHub App token with repo admin scope, used by the github provider to create the repo/secrets/branch protection"
   type        = string
   sensitive   = true
+
+  validation {
+    condition     = length(var.github_token) > 0
+    error_message = "GitHub token cannot be empty."
+  }
 }
 
 ############################
@@ -380,14 +385,4 @@ variable "runner_autoscale_max" {
   type    = number
   default = 5
 
-}
-variable "github_token" {
-  description = "GitHub PAT"
-  type        = string
-  sensitive   = true
-
-  validation {
-    condition     = length(var.github_token) > 0
-    error_message = "GitHub token cannot be empty."
-  }
 }
