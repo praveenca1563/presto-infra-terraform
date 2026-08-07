@@ -3,9 +3,11 @@ variable "scope" {
   type        = string
 }
 
-variable "role_assignments" {
-  description = "List of role assignments"
+variable "assignments" {
+  description = "List of Azure RBAC assignments"
+
   type = list(object({
+    scope                = string
     role_definition_name = string
     principal_id         = string
   }))
