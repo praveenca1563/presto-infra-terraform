@@ -133,17 +133,17 @@ enable_branch_protection = false
 # GitHub Self-hosted Runners
 ############################################################
 
-enable_github_runners = true
+#enable_github_runners = true
 
-runner_vmss_name = "prs-dataeng-gh-runners"
+#runner_vmss_name = "prs-dataeng-gh-runners"
 
-runner_vm_size = "Standard_DC2s_v3"
+#runner_vm_size = "Standard_DC2s_v3"
 
 # Increase if you expect parallel Terraform deployments.
-runner_instance_count = 2
+#runner_instance_count = 2
 
-runner_autoscale_min = 1
-runner_autoscale_max = 5
+#runner_autoscale_min = 1
+#runner_autoscale_max = 5
 
 ############################################################
 # Sensitive Values

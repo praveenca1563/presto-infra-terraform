@@ -37,7 +37,3 @@ output "databricks_workspace_url" {
 output "github_repository_html_url" {
   value = module.github_repo.repository_html_url
 }
-
-output "github_runner_vmss_name" {
-  value = var.enable_github_runners ? module.github_runners[0].vmss_name : null
-}

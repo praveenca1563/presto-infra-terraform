@@ -1,0 +1,193 @@
+warning: in the working copy of 'modules/github-repo/variables.tf', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'outputs.tf', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'variables.tf', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/.github/workflows/terraform-bootstrap.yml b/.github/workflows/terraform-bootstrap.yml[m
+[1mindex ee2d168..4084720 100644[m
+[1m--- a/.github/workflows/terraform-bootstrap.yml[m
+[1m+++ b/.github/workflows/terraform-bootstrap.yml[m
+[36m@@ -28,10 +28,7 @@[m [mjobs:[m
+ [m
+     name: Bootstrap Azure Infrastructure[m
+ [m
+[31m-    runs-on:[m
+[31m-      - self-hosted[m
+[31m-      - Windows[m
+[31m-      - X64[m
+[32m+[m[32m    runs-on: windows-latest[m
+ [m
+     timeout-minutes: 90[m
+ [m
+[36m@@ -204,8 +201,7 @@[m [mjobs:[m
+         TF_VAR_github_owner: ${{ github.repository_owner }}[m
+         TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}[m
+ [m
+[31m-        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}[m
+[31m-        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}[m
+[32m+[m
+ [m
+       run: |[m
+ [m
+[36m@@ -245,8 +241,7 @@[m [mjobs:[m
+         TF_VAR_github_owner: ${{ github.repository_owner }}[m
+         TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}[m
+ [m
+[31m-        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}[m
+[31m-        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}[m
+[32m+[m
+ [m
+       run: |[m
+ [m
+[1mdiff --git a/.github/workflows/terraform.yml b/.github/workflows/terraform.yml[m
+[1mindex 89090b0..e4682dd 100644[m
+[1m--- a/.github/workflows/terraform.yml[m
+[1m+++ b/.github/workflows/terraform.yml[m
+[36m@@ -27,12 +27,9 @@[m [menv:[m
+   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}[m
+   TF_LOG: INFO[m
+ [m
+[31m-permissions:[m
+[31m-  contents: read[m
+[31m-[m
+[31m-#################################################################################[m
+[32m+[m[32m################################################################################[m
+ # TERRAFORM PLAN[m
+[31m-#################################################################################[m
+[32m+[m[32m################################################################################[m
+ [m
+ jobs:[m
+ [m
+[36m@@ -40,10 +37,8 @@[m [mjobs:[m
+ [m
+     name: Terraform Plan[m
+ [m
+[31m-    runs-on:[m
+[31m-      - self-hosted[m
+[31m-      - Windows[m
+[31m-      - X64[m
+[32m+[m[32m    # GitHub-hosted Microsoft Windows runner[m
+[32m+[m[32m    runs-on: windows-latest[m
+ [m
+     timeout-minutes: 90[m
+ [m
+[36m@@ -59,73 +54,54 @@[m [mjobs:[m
+ [m
+     steps:[m
+ [m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m[32m      # Checkout[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m
+       - name: Checkout Repository[m
+         uses: actions/checkout@v4[m
+ [m
+[31m-     # - name: Setup Terraform[m
+[31m-      #  uses: hashicorp/setup-terraform@v3[m
+[31m-       # with:[m
+[31m-        #  terraform_version: ${{ env.TF_VERSION }}[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m[32m      # Setup Terraform[m
+[32m+[m[32m      ##########################################################################[m
+ [m
+[31m-      #- name: Verify Local Terraform[m
+[31m-      #  shell: powershell[m
+[31m-      #  run: |[m
+[31m-       #   where.exe terraform[m
+[31m-        #  terraform version[m
+[32m+[m[32m      - name: Setup Terraform[m
+[32m+[m[32m        uses: hashicorp/setup-terraform@v3[m
+[32m+[m[32m        with:[m
+[32m+[m[32m          terraform_version: ${{ env.TF_VERSION }}[m
+[32m+[m[32m          terraform_wrapper: false[m
+ [m
+[31m-      - name: Install Terraform[m
+[32m+[m[32m      - name: Verify Terraform[m
+         shell: powershell[m
+         run: |[m
+[31m-          $ProgressPreference = 'SilentlyContinue'[m
+[31m-[m
+[31m-          Invoke-WebRequest `[m
+[31m-          -Uri "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_windows_amd64.zip" `[m
+[31m-          -OutFile terraform.zip[m
+[31m-[m
+[31m-          Expand-Archive terraform.zip -DestinationPath terraform -Force[m
+[31m-[m
+[31m-          "$PWD\terraform" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append[m
+[31m-[m
+[31m-          .\terraform\terraform.exe version[m
+[32m+[m[32m          Write-Host "Terraform version:"[m
+[32m+[m[32m          terraform version[m
+ [m
+[31m-      - name: Cache Terraform[m
+[31m-        uses: actions/cache@v4[m
+[31m-        with:[m
+[31m-          path: .terraform[m
+[31m-          key: terraform-${{ runner.os }}-${{ hashFiles('**/*.tf','**/.terraform.lock.hcl') }}[m
+[31m-          restore-keys: |[m
+[31m-            terraform-${{ runner.os }}-[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m[32m      # Azure Login[m
+[32m+[m[32m      ##########################################################################[m
+ [m
+       - name: Azure Login[m
+         uses: azure/login@v2[m
+         with:[m
+           creds: |[m
+             {[m
+[31m-              "clientId":"${{ secrets.AZURE_CLIENT_ID }}",[m
+[31m-              "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",[m
+[31m-              "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",[m
+[31m-              "tenantId":"${{ secrets.AZURE_TENANT_ID }}"[m
+[32m+[m[32m              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",[m
+[32m+[m[32m              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",[m
+[32m+[m[32m              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",[m
+[32m+[m[32m              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"[m
+             }[m
+[31m-      # - name: Verify Terraform Executable[m
+[31m-      #   shell: powershell[m
+[31m-      #   run: |[m
+[31m-      #     Write-Host "PATH:"[m
+[31m-      #     $env:PATH[m
+ [m
+[31m-      #     Write-Host ""[m
+[31m-      #     Write-Host "Terraform location:"[m
+[31m-      #     where.exe terraform[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m[32m      # Verify GitHub Variables[m
+[32m+[m[32m      ##########################################################################[m
+ [m
+[31m-      #     Write-Host ""[m
+[31m-      #     Get-Command terraform | Format-List *[m
+[31m-[m
+[31m-      #     Write-Host ""[m
+[31m-      #     terraform version[m
+       - name: Verify GitHub Variables[m
+         shell: powershell[m
+         env:[m
+           TF_VAR_github_owner: ${{ github.repository_owner }}[m
+           TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}[m
+[32m+[m
+         run: |[m
+           Write-Host "====================================="[m
+           Write-Host "GitHub Variables"[m
+[36m@@ -135,10 +111,16 @@[m [mjobs:[m
+ [m
+           if ([string]::IsNullOrWhiteSpace($env:TF_VAR_github_token)) {[m
+             Write-Error "GitHub Token is EMPTY!"[m
+[32m+[m[32m            exit 1[m
+           }[m
+           else {[m
+             Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"[m
+           }[m
+[32m+[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m[32m      # Terraform Init[m
+[32m+[m[32m      ##########################################################################[m
+[32m+[m
+       - name: Terraform Init[m
+         shell: powershell[m
+         env:[m
+[36m@@ -146,15 +128,32 @@[m [mjobs:[m
+           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}[m
+           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}[m
+           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}[m
+[32m+[

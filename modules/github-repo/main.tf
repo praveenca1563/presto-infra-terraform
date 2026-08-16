@@ -68,10 +68,4 @@ resource "github_actions_secret" "azure_client_secret" {
   value       = var.azure_client_secret
 }
 
-resource "github_actions_secret" "runner_registration_token" {
-  count = var.runner_registration_token != null ? 1 : 0
 
-  repository  = github_repository.this.name
-  secret_name = "RUNNER_REGISTRATION_TOKEN"
-  value       = var.runner_registration_token
-}

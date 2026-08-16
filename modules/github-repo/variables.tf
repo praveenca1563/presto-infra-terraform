@@ -71,9 +71,4 @@ variable "azure_client_secret" {
   default     = null
 }
 
-variable "runner_registration_token" {
-  description = "GitHub Actions self-hosted runner registration token, if pre-provisioning it as a repo secret for the runner bootstrap script"
-  type        = string
-  sensitive   = true
-  default     = null
-}
+

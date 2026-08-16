@@ -28,10 +28,7 @@ jobs:
 
     name: Bootstrap Azure Infrastructure
 
-    runs-on:
-      - self-hosted
-      - Windows
-      - X64
+    runs-on: windows-latest
 
     timeout-minutes: 90
 
@@ -204,8 +201,7 @@ jobs:
         TF_VAR_github_owner: ${{ github.repository_owner }}
         TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
 
-        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+
 
       run: |
 
@@ -245,8 +241,7 @@ jobs:
         TF_VAR_github_owner: ${{ github.repository_owner }}
         TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
 
-        TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-        TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+
 
       run: |
 

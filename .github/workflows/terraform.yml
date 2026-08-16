@@ -27,12 +27,9 @@ env:
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
   TF_LOG: INFO
 
-permissions:
-  contents: read
-
-#################################################################################
+################################################################################
 # TERRAFORM PLAN
-#################################################################################
+################################################################################
 
 jobs:
 
@@ -40,10 +37,8 @@ jobs:
 
     name: Terraform Plan
 
-    runs-on:
-      - self-hosted
-      - Windows
-      - X64
+    # GitHub-hosted Microsoft Windows runner
+    runs-on: windows-latest
 
     timeout-minutes: 90
 
@@ -59,73 +54,54 @@ jobs:
 
     steps:
 
+      ##########################################################################
+      # Checkout
+      ##########################################################################
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-     # - name: Setup Terraform
-      #  uses: hashicorp/setup-terraform@v3
-       # with:
-        #  terraform_version: ${{ env.TF_VERSION }}
+      ##########################################################################
+      # Setup Terraform
+      ##########################################################################
 
-      #- name: Verify Local Terraform
-      #  shell: powershell
-      #  run: |
-       #   where.exe terraform
-        #  terraform version
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
-      - name: Install Terraform
+      - name: Verify Terraform
         shell: powershell
         run: |
-          $ProgressPreference = 'SilentlyContinue'
+          Write-Host "Terraform version:"
+          terraform version
 
-          Invoke-WebRequest `
-          -Uri "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_windows_amd64.zip" `
-          -OutFile terraform.zip
-
-          Expand-Archive terraform.zip -DestinationPath terraform -Force
-
-          "$PWD\terraform" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          .\terraform\terraform.exe version
-
-      - name: Cache Terraform
-        uses: actions/cache@v4
-        with:
-          path: .terraform
-          key: terraform-${{ runner.os }}-${{ hashFiles('**/*.tf','**/.terraform.lock.hcl') }}
-          restore-keys: |
-            terraform-${{ runner.os }}-
+      ##########################################################################
+      # Azure Login
+      ##########################################################################
 
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: |
             {
-              "clientId":"${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",
-              "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-              "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
             }
-      # - name: Verify Terraform Executable
-      #   shell: powershell
-      #   run: |
-      #     Write-Host "PATH:"
-      #     $env:PATH
 
-      #     Write-Host ""
-      #     Write-Host "Terraform location:"
-      #     where.exe terraform
+      ##########################################################################
+      # Verify GitHub Variables
+      ##########################################################################
 
-      #     Write-Host ""
-      #     Get-Command terraform | Format-List *
-
-      #     Write-Host ""
-      #     terraform version
       - name: Verify GitHub Variables
         shell: powershell
         env:
           TF_VAR_github_owner: ${{ github.repository_owner }}
           TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+
         run: |
           Write-Host "====================================="
           Write-Host "GitHub Variables"
@@ -135,10 +111,16 @@ jobs:
 
           if ([string]::IsNullOrWhiteSpace($env:TF_VAR_github_token)) {
             Write-Error "GitHub Token is EMPTY!"
+            exit 1
           }
           else {
             Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"
           }
+
+      ##########################################################################
+      # Terraform Init
+      ##########################################################################
+
       - name: Terraform Init
         shell: powershell
         env:
@@ -146,15 +128,32 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
         run: |
           terraform init `
             -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
 
+      ##########################################################################
+      # Terraform Format
+      ##########################################################################
+
       - name: Terraform Format
-        run: terraform fmt -check -recursive
+        shell: powershell
+        run: |
+          terraform fmt -check -recursive
+
+      ##########################################################################
+      # Terraform Validate
+      ##########################################################################
 
       - name: Terraform Validate
-        run: terraform validate
+        shell: powershell
+        run: |
+          terraform validate
+
+      ##########################################################################
+      # Install TFLint
+      ##########################################################################
 
       - name: Install TFLint
         shell: powershell
@@ -165,37 +164,58 @@ jobs:
             -Uri "https://github.com/terraform-linters/tflint/releases/latest/download/tflint_windows_amd64.zip" `
             -OutFile tflint.zip
 
-          Expand-Archive -Path tflint.zip -DestinationPath .\tflint -Force
+          Expand-Archive `
+            -Path tflint.zip `
+            -DestinationPath .\tflint `
+            -Force
 
           $env:PATH += ";$PWD\tflint"
 
           .\tflint\tflint.exe --version
 
+      ##########################################################################
+      # Initialize TFLint
+      ##########################################################################
+
       - name: Initialize TFLint
         shell: powershell
         run: |
-         .\tflint\tflint.exe --init
+          .\tflint\tflint.exe --init
+
+      ##########################################################################
+      # Run TFLint
+      ##########################################################################
 
       - name: Run TFLint
         shell: powershell
         run: |
-         .\tflint\tflint.exe
+          .\tflint\tflint.exe
 
-     # - name: Setup TFLint
-     #   uses: terraform-linters/setup-tflint@v4
+      ##########################################################################
+      # Verify Runner
+      ##########################################################################
 
-     # - name: Initialize TFLint
-      #  run: tflint --init
+      - name: Verify GitHub Hosted Runner
+        shell: powershell
+        run: |
+          Write-Host "====================================="
+          Write-Host "GitHub Runner Information"
+          Write-Host "====================================="
 
-      #- name: Run TFLint
-       # run: tflint
+          Write-Host "Runner OS          : $env:RUNNER_OS"
+          Write-Host "Runner Environment : $env:RUNNER_ENVIRONMENT"
+          Write-Host "Runner Name        : $env:RUNNER_NAME"
+          Write-Host "Runner Architecture: $env:RUNNER_ARCH"
+          Write-Host "Computer Name      : $env:COMPUTERNAME"
 
-     # - name: Run Checkov
-     #   uses: bridgecrewio/checkov-action@master
-     #   with:
-      #    directory: .
+          Write-Host "====================================="
+
+      ##########################################################################
+      # Terraform Plan
+      ##########################################################################
 
       - name: Terraform Plan
+        shell: powershell
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -210,13 +230,16 @@ jobs:
           TF_VAR_github_owner: ${{ github.repository_owner }}
           TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
 
-          TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-          TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
+      
 
         run: |
           terraform plan `
             -var-file="environments/${env:ENVIRONMENT}/terraform.tfvars" `
             -out=tfplan
+
+      ##########################################################################
+      # Upload Terraform Plan
+      ##########################################################################
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
@@ -224,27 +247,11 @@ jobs:
           name: terraform-plan-${{ env.ENVIRONMENT }}
           path: tfplan
           retention-days: 5
-      - name: Verify GitHub Variables
-        shell: powershell
-        env:
-          TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
-        run: |
-          Write-Host "====================================="
-          Write-Host "GitHub Variables"
-          Write-Host "====================================="
 
-          Write-Host "Owner : $env:TF_VAR_github_owner"
 
-          if ([string]::IsNullOrWhiteSpace($env:TF_VAR_github_token)) {
-            Write-Error "GitHub Token is EMPTY!"
-          }
-          else {
-            Write-Host "GitHub Token Length : $($env:TF_VAR_github_token.Length)"
-          }
-#################################################################################
-# TERRAFORM APPLY
-#################################################################################
+  ################################################################################
+  # TERRAFORM APPLY
+  ################################################################################
 
   terraform-apply:
 
@@ -254,10 +261,8 @@ jobs:
 
     if: github.ref == 'refs/heads/Dev' && github.event_name != 'pull_request'
 
-    runs-on:
-      - self-hosted
-      - Windows
-      - X64
+    # GitHub-hosted Microsoft Windows runner
+    runs-on: windows-latest
 
     timeout-minutes: 90
 
@@ -272,8 +277,16 @@ jobs:
 
     steps:
 
+      ##########################################################################
+      # Checkout
+      ##########################################################################
+
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      ##########################################################################
+      # Setup Terraform
+      ##########################################################################
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -281,53 +294,30 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
-      # - name: Verify Terraform Installation
-      #   shell: powershell
-      #   run: |
-      #    Write-Host "========================================"
-      #    Write-Host "Terraform Installation"
-      #    Write-Host "========================================"
-
-      #    Write-Host ""
-      #    Write-Host "PATH"
-      #    Write-Host $env:PATH
-
-      #    Write-Host ""
-      #    Write-Host "Terraform Location"
-      #    where.exe terraform
-
-      #    Write-Host ""
-      #    Get-Command terraform | Format-List *
-
-      #    Write-Host ""
-      #    Write-Host "Terraform Version"
-      #    terraform version
-
-      - name: Install Terraform
+      - name: Verify Terraform
         shell: powershell
         run: |
-          $ProgressPreference = 'SilentlyContinue'
+          Write-Host "Terraform version:"
+          terraform version
 
-          Invoke-WebRequest `
-          -Uri "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_windows_amd64.zip" `
-          -OutFile terraform.zip
-
-          Expand-Archive terraform.zip -DestinationPath terraform -Force
-
-          "$PWD\terraform" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          .\terraform\terraform.exe version
+      ##########################################################################
+      # Azure Login
+      ##########################################################################
 
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: |
             {
-              "clientId":"${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",
-              "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-              "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
             }
+
+      ##########################################################################
+      # Terraform Init
+      ##########################################################################
 
       - name: Terraform Init
         shell: powershell
@@ -336,17 +326,26 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
         run: |
-          terraform version
           terraform init `
             -backend-config="environments/${env:ENVIRONMENT}/backend.hcl"
+
+      ##########################################################################
+      # Download Terraform Plan
+      ##########################################################################
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
           name: terraform-plan-${{ env.ENVIRONMENT }}
 
+      ##########################################################################
+      # Terraform Apply
+      ##########################################################################
+
       - name: Terraform Apply
+        shell: powershell
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -361,11 +360,15 @@ jobs:
           TF_VAR_github_owner: ${{ github.repository_owner }}
           TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
 
-          TF_VAR_runner_ssh_public_key: ${{ secrets.RUNNER_SSH_PUBLIC_KEY }}
-          TF_VAR_runner_registration_token: ${{ secrets.RUNNER_REGISTRATION_TOKEN }}
-
+          
         run: |
           terraform apply -auto-approve tfplan
 
+      ##########################################################################
+      # Terraform Output
+      ##########################################################################
+
       - name: Terraform Output
-        run: terraform output
+        shell: powershell
+        run: |
+          terraform output

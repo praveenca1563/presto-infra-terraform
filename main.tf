@@ -160,43 +160,43 @@ module "github_repo" {
   azure_subscription_id = var.azure_subscription_id
   azure_client_secret   = var.azure_client_secret
 
-  runner_registration_token = var.enable_github_runners ? var.runner_registration_token : null
-  enable_branch_protection  = var.enable_branch_protection
+  #runner_registration_token = var.enable_github_runners ? var.runner_registration_token : null
+  enable_branch_protection = var.enable_branch_protection
 }
 
 ############################################################
 # GitHub Self-Hosted Runners
 ############################################################
 
-module "github_runners" {
-  source = "./modules/github-runners"
+# module "github_runners" {
+# source = "./modules/github-runners"
 
-  count = var.enable_github_runners ? 1 : 0
+#count = var.enable_github_runners ? 1 : 0
 
-  vmss_name           = var.runner_vmss_name != "" ? var.runner_vmss_name : "${var.repository_name}-runners"
-  resource_group_name = data.azurerm_resource_group.infra.name
-  location            = var.location
-  identity_name       = "${var.repository_name}-runner-identity"
+#vmss_name           = var.runner_vmss_name != "" ? var.runner_vmss_name : "${var.repository_name}-runners"
+#resource_group_name = data.azurerm_resource_group.infra.name
+#location            = var.location
+#identity_name       = "${var.repository_name}-runner-identity"
 
-  vm_size        = var.runner_vm_size
-  instance_count = var.runner_instance_count
-  ssh_public_key = var.runner_ssh_public_key
-  subnet_id      = module.networking.subnet_ids[var.data_subnet_key]
+#vm_size        = var.runner_vm_size
+#instance_count = var.runner_instance_count
+#ssh_public_key = var.runner_ssh_public_key
+#subnet_id      = module.networking.subnet_ids[var.data_subnet_key]
 
-  github_owner = var.github_owner
-  github_repo  = var.repository_name
+#github_owner = var.github_owner
+#github_repo  = var.repository_name
 
-  runner_registration_token = var.runner_registration_token
-  autoscale_min             = var.runner_autoscale_min
-  autoscale_max             = var.runner_autoscale_max
+#runner_registration_token = var.runner_registration_token
+#autoscale_min             = var.runner_autoscale_min
+#autoscale_max             = var.runner_autoscale_max
 
-  tags = local.common_tags
+#tags = local.common_tags
 
-  depends_on = [
-    module.github_repo,
-    module.networking
-  ]
-}
+#depends_on = [
+# module.github_repo,
+#module.networking
+#]
+#}
 
 
 ############################################################

@@ -327,65 +327,65 @@ variable "enable_branch_protection" {
 # GitHub self-hosted runners
 ############################
 
-variable "enable_github_runners" {
-  type    = bool
-  default = true
-}
+#variable "enable_github_runners" {
+# type    = bool
+# default = true
+#}
 
-variable "runner_vmss_name" {
-  type    = string
-  default = ""
-}
+#variable "runner_vmss_name" {
+# type    = string
+# default = ""
+#}
 
-variable "runner_vm_size" {
-  type    = string
-  default = "Standard_D2s_v5"
-}
+#variable "runner_vm_size" {
+# type    = string
+# default = "Standard_D2s_v5"
+#}
 
-variable "runner_instance_count" {
+#variable "runner_instance_count" {
 
-  type    = number
-  default = 2
+# type    = number
+# default = 2
 
-  validation {
+# validation {
 
-    condition = (
-      var.runner_instance_count >= 1 &&
-      var.runner_instance_count <= 20
-    )
+#  condition = (
+#   var.runner_instance_count >= 1 &&
+#  var.runner_instance_count <= 20
+#)
 
-    error_message = "Runner count must be between 1 and 20."
+#error_message = "Runner count must be between 1 and 20."
 
-  }
+#}
 
-}
+#}
 
-variable "runner_ssh_public_key" {
-  type = string
-}
+#variable "runner_ssh_public_key" {
+# type = string
+#}
 
-variable "runner_registration_token" {
-  description = "Short-lived GitHub Actions runner registration token (see README)"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
+#variable "runner_registration_token" {
+#  description = "Short-lived GitHub Actions runner registration token (see README)"
+#  type        = string
+#  sensitive   = true
+#  default     = ""
+#}
 
-variable "runner_autoscale_min" {
-  type    = number
-  default = 1
+#variable "runner_autoscale_min" {
+#  type    = number
+#  default = 1
 
-  validation {
-    condition     = var.runner_autoscale_min >= 1
-    error_message = "Minimum runner count must be at least 1."
-  }
-}
+#validation {
+# condition     = var.runner_autoscale_min >= 1
+#  error_message = "Minimum runner count must be at least 1."
+# }
+#}
 
-variable "runner_autoscale_max" {
-  type    = number
-  default = 5
+#variable "runner_autoscale_max" {
+# type    = number
+# default = 5
 
-}
+#}
 
 variable "existing_infra_resource_group_name" {
   description = "Existing Infrastructure Resource Group"
