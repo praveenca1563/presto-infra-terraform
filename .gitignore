@@ -1,9 +1,14 @@
 # Terraform
+<<<<<<< HEAD
 .terraform/
+=======
+**/.terraform/*
+>>>>>>> origin/Dev
 *.tfstate
 *.tfstate.*
 crash.log
 crash.*.log
+<<<<<<< HEAD
 tfplan
 *.tfplan
 
@@ -11,12 +16,25 @@ tfplan
 *.tfvars
 *.auto.tfvars
 !*.tfvars.example
+=======
+*.tfvars
+!*.tfvars.example
+!environments/**/terraform.tfvars
+*.auto.tfvars
+!*.auto.tfvars.example
+.terraform.lock.hcl
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+>>>>>>> origin/Dev
 
 # Never commit real secrets
 secrets.auto.tfvars
 *.pem
 *.key
 
+<<<<<<< HEAD
 # Terraform lock file
 # Keep this committed so provider versions are reproducible
 # .terraform.lock.hcl
@@ -27,15 +45,24 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+=======
+>>>>>>> origin/Dev
 # OS / editor
 .DS_Store
 .idea/
 .vscode/
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Dev
 # Terraform binary
 terraform.exe
 
 # Optional local tools
 tools/
+<<<<<<< HEAD
 *.zip
+=======
+*.zipterraform.log
+>>>>>>> origin/Dev
 *.log

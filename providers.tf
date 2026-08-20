@@ -22,6 +22,7 @@ provider "azurerm" {
   client_secret   = var.azure_client_secret
 
   resource_provider_registrations = "core"
+<<<<<<< HEAD
   # Use Microsoft Entra ID for Storage Blob/Queue data-plane operations
   storage_use_azuread = true
 }
@@ -35,6 +36,8 @@ provider "azapi" {
   tenant_id       = var.azure_tenant_id
   client_id       = var.azure_client_id
   client_secret   = var.azure_client_secret
+=======
+>>>>>>> origin/Dev
 }
 
 ############################################################
