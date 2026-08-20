@@ -26,11 +26,7 @@ resource "azurerm_databricks_workspace" "this" {
   }
 
   lifecycle {
-<<<<<<< HEAD
     prevent_destroy = false
-=======
-    prevent_destroy = true
->>>>>>> origin/Dev
   }
 
   tags = var.tags

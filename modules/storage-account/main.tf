@@ -45,14 +45,10 @@ resource "azurerm_storage_blob" "folders" {
   type           = "Block"
   source_content = ""
 
-<<<<<<< HEAD
   depends_on = [
     azurerm_storage_container.containers,
     var.rbac_dependency
   ]
-=======
-  depends_on = [azurerm_storage_container.containers]
->>>>>>> origin/Dev
 }
 
 resource "azurerm_storage_container" "containers" {

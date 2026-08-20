@@ -31,11 +31,7 @@ data "azurerm_network_security_group" "this" {
 }
 
 ############################################################
-<<<<<<< HEAD
 # Existing Route Tables
-=======
-# Existing Route Tables (Optional)
->>>>>>> origin/Dev
 ############################################################
 
 data "azurerm_route_table" "this" {
@@ -47,7 +43,6 @@ data "azurerm_route_table" "this" {
 
   name                = each.value.route_table_name
   resource_group_name = var.resource_group_name
-<<<<<<< HEAD
 }
 
 ############################################################
@@ -128,6 +123,4 @@ resource "azapi_update_resource" "data_service_endpoint" {
   depends_on = [
     azapi_update_resource.databricks_private_service_endpoint
   ]
-=======
->>>>>>> origin/Dev
 }

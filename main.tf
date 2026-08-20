@@ -23,7 +23,6 @@ data "azurerm_resource_group" "infra" {
   name = var.existing_infra_resource_group_name
 }
 
-<<<<<<< HEAD
 
 ############################################################
 # Existing Data Resource Group
@@ -42,27 +41,12 @@ data "azurerm_resource_group" "network" {
 }
 
 
-=======
->>>>>>> origin/Dev
 ############################################################
 # Current Terraform Identity
 ############################################################
 
 data "azurerm_client_config" "current" {}
 
-<<<<<<< HEAD
-=======
-############################################################
-# Resource Groups
-############################################################
-
-module "resource_groups" {
-  source = "./modules/resource-group"
-
-  resource_groups = var.resource_groups
-  common_tags     = local.common_tags
-}
->>>>>>> origin/Dev
 
 ############################################################
 # Networking
@@ -71,7 +55,6 @@ module "resource_groups" {
 module "networking" {
   source = "./modules/networking"
 
-<<<<<<< HEAD
   providers = {
     azapi = azapi
   }
@@ -83,15 +66,6 @@ module "networking" {
 }
 
 
-=======
-  vnet_name           = var.vnet_name
-  resource_group_name = data.azurerm_resource_group.infra.name
-  subnets             = var.subnets
-
-  tags = var.common_tags
-}
-
->>>>>>> origin/Dev
 ############################################################
 # Key Vault
 ############################################################
@@ -99,11 +73,7 @@ module "networking" {
 module "key_vault" {
   source = "./modules/key-vault"
 
-<<<<<<< HEAD
   key_vault_name            = local.names.key_vault_name
-=======
-  key_vault_name            = var.key_vault_name
->>>>>>> origin/Dev
   resource_group_name       = data.azurerm_resource_group.infra.name
   location                  = var.location
   tenant_id                 = var.azure_tenant_id
@@ -114,10 +84,7 @@ module "key_vault" {
   tags = local.common_tags
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################################################
 # Storage Account
 ############################################################
@@ -125,13 +92,8 @@ module "key_vault" {
 module "storage_account" {
   source = "./modules/storage-account"
 
-<<<<<<< HEAD
   storage_account_name = local.names.storage_account_name
   resource_group_name  = data.azurerm_resource_group.data.name
-=======
-  storage_account_name = var.storage_account_name
-  resource_group_name  = module.resource_groups.resource_group_names[var.data_rg_key]
->>>>>>> origin/Dev
   location             = var.location
 
   containers = var.storage_containers
@@ -146,15 +108,10 @@ module "storage_account" {
   ]
 
   tags = local.common_tags
-<<<<<<< HEAD
-  
+
 }
 
 
-=======
-}
-
->>>>>>> origin/Dev
 ############################################################
 # Azure Data Factory
 ############################################################
@@ -162,13 +119,8 @@ module "storage_account" {
 module "data_factory" {
   source = "./modules/data-factory"
 
-<<<<<<< HEAD
   data_factory_name      = local.names.data_factory_name
   resource_group_name    = data.azurerm_resource_group.data.name
-=======
-  data_factory_name      = var.data_factory_name
-  resource_group_name    = module.resource_groups.resource_group_names[var.data_rg_key]
->>>>>>> origin/Dev
   location               = var.location
   public_network_enabled = var.adf_public_network_enabled
   storage_account_id     = module.storage_account.storage_account_id
@@ -179,10 +131,7 @@ module "data_factory" {
   tags = local.common_tags
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################################################
 # Azure Databricks
 ############################################################
@@ -190,19 +139,11 @@ module "data_factory" {
 module "databricks" {
   source = "./modules/databricks"
 
-<<<<<<< HEAD
   workspace_name              = local.names.databricks_workspace_name
   resource_group_name         = data.azurerm_resource_group.data.name
   location                    = var.location
   sku                         = var.databricks_sku
   managed_resource_group_name = local.names.databricks_managed_rg_name
-=======
-  workspace_name              = var.databricks_workspace_name
-  resource_group_name         = module.resource_groups.resource_group_names[var.data_rg_key]
-  location                    = var.location
-  sku                         = var.databricks_sku
-  managed_resource_group_name = var.databricks_managed_rg_name
->>>>>>> origin/Dev
 
   enable_vnet_injection = true
 
@@ -218,10 +159,7 @@ module "databricks" {
   tags = local.common_tags
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################################################
 # GitHub Repository
 ############################################################
@@ -239,7 +177,6 @@ module "github_repo" {
   azure_subscription_id = var.azure_subscription_id
   azure_client_secret   = var.azure_client_secret
 
-<<<<<<< HEAD
   enable_branch_protection = var.enable_branch_protection
 }
 
@@ -249,53 +186,6 @@ module "github_repo" {
 ############################################################
 
 module "rbac" {
-=======
-  #runner_registration_token = var.enable_github_runners ? var.runner_registration_token : null
-  enable_branch_protection = var.enable_branch_protection
-}
-
-############################################################
-# GitHub Self-Hosted Runners
-############################################################
-
-# module "github_runners" {
-# source = "./modules/github-runners"
-
-#count = var.enable_github_runners ? 1 : 0
-
-#vmss_name           = var.runner_vmss_name != "" ? var.runner_vmss_name : "${var.repository_name}-runners"
-#resource_group_name = data.azurerm_resource_group.infra.name
-#location            = var.location
-#identity_name       = "${var.repository_name}-runner-identity"
-
-#vm_size        = var.runner_vm_size
-#instance_count = var.runner_instance_count
-#ssh_public_key = var.runner_ssh_public_key
-#subnet_id      = module.networking.subnet_ids[var.data_subnet_key]
-
-#github_owner = var.github_owner
-#github_repo  = var.repository_name
-
-#runner_registration_token = var.runner_registration_token
-#autoscale_min             = var.runner_autoscale_min
-#autoscale_max             = var.runner_autoscale_max
-
-#tags = local.common_tags
-
-#depends_on = [
-# module.github_repo,
-#module.networking
-#]
-#}
-
-
-############################################################
-#  RBAC
-############################################################
-
-module "rbac" {
-
->>>>>>> origin/Dev
   source = "./modules/rbac"
 
   assignments = concat(
@@ -355,9 +245,4 @@ module "rbac" {
     module.data_factory,
     module.databricks
   ]
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> origin/Dev

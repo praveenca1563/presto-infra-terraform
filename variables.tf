@@ -1,10 +1,5 @@
 ############################
-<<<<<<< HEAD
 # Authentication
-=======
-# Authentication (all sensitive — supply via TF_VAR_ env vars or CI secrets,
-# never in a committed .tfvars file)
->>>>>>> origin/Dev
 ############################
 
 variable "azure_subscription_id" {
@@ -17,10 +12,7 @@ variable "azure_subscription_id" {
     error_message = "Azure Subscription ID cannot be empty."
   }
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 variable "azure_tenant_id" {
   type      = string
   sensitive = true
@@ -52,10 +44,7 @@ variable "github_token" {
   }
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################
 # General
 ############################
@@ -76,7 +65,6 @@ variable "environment" {
 
 variable "location" {
   description = "Azure region."
-<<<<<<< HEAD
   type        = string
 
   validation {
@@ -85,29 +73,6 @@ variable "location" {
     ], var.location)
 
     error_message = "Unsupported Azure region."
-=======
-
-  type = string
-
-  validation {
-
-    condition = contains([
-      "East US",
-      "East US 2",
-      "Central US",
-      "West US",
-      "West US 2",
-      "Canada Central",
-      "Canada East",
-      "North Europe",
-      "West Europe",
-      "Southeast Asia",
-      "Australia East"
-    ], var.location)
-
-    error_message = "Unsupported Azure region."
-
->>>>>>> origin/Dev
   }
 }
 
@@ -116,7 +81,6 @@ variable "common_tags" {
   default = {}
 }
 
-<<<<<<< HEAD
 
 ############################
 # Naming Standard
@@ -176,25 +140,6 @@ variable "existing_network_resource_group_name" {
 }
 
 
-=======
-############################
-# Resource groups
-############################
-
-variable "resource_groups" {
-  type = map(object({
-    name     = string
-    location = string
-    tags     = optional(map(string), {})
-  }))
-}
-
-variable "data_rg_key" {
-  description = "Key (from resource_groups map) of the RG that holds ADF/storage/Databricks"
-  type        = string
-}
-
->>>>>>> origin/Dev
 ############################
 # Networking
 ############################
@@ -203,10 +148,6 @@ variable "vnet_name" {
   type = string
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Dev
 variable "subnets" {
   description = "Existing Azure subnets to be used by the platform."
 
@@ -232,16 +173,12 @@ variable "data_subnet_key" {
   type        = string
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################
 # Storage (ADLS Gen2)
 ############################
 
 variable "storage_account_name" {
-<<<<<<< HEAD
   description = "Azure Storage Account name. Leave null to auto-generate from the naming standard in local.tf."
   type        = string
   default     = null
@@ -257,25 +194,6 @@ variable "storage_account_name" {
 
     error_message = "Storage account names must be 3-24 lowercase alphanumeric characters."
   }
-=======
-
-  description = "Azure Storage Account name."
-
-  type = string
-
-  validation {
-
-    condition = (
-      length(var.storage_account_name) >= 3 &&
-      length(var.storage_account_name) <= 24 &&
-      can(regex("^[a-z0-9]+$", var.storage_account_name))
-    )
-
-    error_message = "Storage account names must be 3-24 lowercase alphanumeric characters."
-
-  }
-
->>>>>>> origin/Dev
 }
 
 variable "storage_containers" {
@@ -288,7 +206,6 @@ variable "storage_folders" {
     container = string
     path      = string
   }))
-<<<<<<< HEAD
 
   default = [
     {
@@ -296,9 +213,6 @@ variable "storage_folders" {
       path      = "data_management"
     }
   ]
-=======
-  default = [{ container = "gold", path = "data_management" }]
->>>>>>> origin/Dev
 }
 
 variable "storage_public_network_access_enabled" {
@@ -306,22 +220,15 @@ variable "storage_public_network_access_enabled" {
   default = true
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################
 # Data Factory
 ############################
 
 variable "data_factory_name" {
-<<<<<<< HEAD
   description = "Azure Data Factory name. Leave null to auto-generate from the naming standard in local.tf."
   type        = string
   default     = null
-=======
-  type = string
->>>>>>> origin/Dev
 }
 
 variable "adf_public_network_enabled" {
@@ -339,16 +246,12 @@ variable "adf_reader_group_object_ids" {
   default = []
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################
 # Databricks
 ############################
 
 variable "databricks_workspace_name" {
-<<<<<<< HEAD
   description = "Azure Databricks workspace name. Leave null to auto-generate from the naming standard in local.tf."
   type        = string
   default     = null
@@ -361,38 +264,17 @@ variable "databricks_managed_rg_name" {
 }
 
 variable "databricks_sku" {
-=======
-  type = string
-}
-
-variable "databricks_managed_rg_name" {
-  type = string
-}
-
-variable "databricks_sku" {
-
->>>>>>> origin/Dev
   type    = string
   default = "premium"
 
   validation {
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Dev
     condition = contains(
       ["standard", "premium"],
       lower(var.databricks_sku)
     )
 
     error_message = "Databricks SKU must be Standard or Premium."
-<<<<<<< HEAD
   }
-=======
-
-  }
-
->>>>>>> origin/Dev
 }
 
 variable "databricks_metastore_admin_object_ids" {
@@ -400,16 +282,12 @@ variable "databricks_metastore_admin_object_ids" {
   default = []
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Dev
 ############################
 # Key Vault
 ############################
 
 variable "key_vault_name" {
-<<<<<<< HEAD
   description = "Azure Key Vault name. Leave null to auto-generate from the naming standard in local.tf."
   type        = string
   default     = null
@@ -424,20 +302,6 @@ variable "key_vault_name" {
     )
 
     error_message = "Invalid Key Vault name."
-=======
-  type = string
-
-  validation {
-
-    condition = (
-      length(var.key_vault_name) >= 3 &&
-      length(var.key_vault_name) <= 24 &&
-      can(regex("^[a-z0-9-]+$", var.key_vault_name))
-    )
-
-    error_message = "Invalid Key Vault name."
-
->>>>>>> origin/Dev
   }
 }
 
@@ -451,30 +315,17 @@ variable "key_vault_secrets_reader_object_ids" {
   default = []
 }
 
-<<<<<<< HEAD
 
 ############################
 # GitHub Repository
-=======
-############################
-# GitHub repository
->>>>>>> origin/Dev
 ############################
 
 variable "repository_name" {
   type = string
 
   validation {
-<<<<<<< HEAD
     condition     = length(var.repository_name) > 0
     error_message = "Repository name cannot be empty."
-=======
-
-    condition = length(var.repository_name) > 0
-
-    error_message = "Repository name cannot be empty."
-
->>>>>>> origin/Dev
   }
 }
 
@@ -484,31 +335,17 @@ variable "repository_description" {
 }
 
 variable "repository_visibility" {
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Dev
   type    = string
   default = "private"
 
   validation {
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Dev
     condition = contains(
       ["private", "public", "internal"],
       lower(var.repository_visibility)
     )
 
     error_message = "Repository visibility must be private, public or internal."
-<<<<<<< HEAD
   }
-=======
-
-  }
-
->>>>>>> origin/Dev
 }
 
 variable "required_approving_review_count" {
@@ -521,7 +358,6 @@ variable "enable_branch_protection" {
   default = false
 }
 
-<<<<<<< HEAD
 
 ############################
 # GitHub Self-hosted Runners
@@ -534,95 +370,3 @@ variable "enable_branch_protection" {
 ############################
 # End
 ############################
-=======
-############################
-# GitHub self-hosted runners
-############################
-
-#variable "enable_github_runners" {
-# type    = bool
-# default = true
-#}
-
-#variable "runner_vmss_name" {
-# type    = string
-# default = ""
-#}
-
-#variable "runner_vm_size" {
-# type    = string
-# default = "Standard_D2s_v5"
-#}
-
-#variable "runner_instance_count" {
-
-# type    = number
-# default = 2
-
-# validation {
-
-#  condition = (
-#   var.runner_instance_count >= 1 &&
-#  var.runner_instance_count <= 20
-#)
-
-#error_message = "Runner count must be between 1 and 20."
-
-#}
-
-#}
-
-#variable "runner_ssh_public_key" {
-# type = string
-#}
-
-#variable "runner_registration_token" {
-#  description = "Short-lived GitHub Actions runner registration token (see README)"
-#  type        = string
-#  sensitive   = true
-#  default     = ""
-#}
-
-#variable "runner_autoscale_min" {
-#  type    = number
-#  default = 1
-
-#validation {
-# condition     = var.runner_autoscale_min >= 1
-#  error_message = "Minimum runner count must be at least 1."
-# }
-#}
-
-#variable "runner_autoscale_max" {
-# type    = number
-# default = 5
-
-#}
-
-variable "existing_infra_resource_group_name" {
-  description = "Existing Infrastructure Resource Group"
-  type        = string
-}
-
-
-
-#variable "adf_admin_group_object_id" {
-#  type = string
-#}
-
-#variable "adf_reader_group_object_id" {
-#  type = string
-#}
-
-#variable "databricks_admin_group_object_id" {
-#  type = string
-#}
-
-#variable "keyvault_admin_group_object_id" {
-#  type = string
-#}
-
-#variable "keyvault_secret_admin_group_object_id" {
-#  type = string
-#}
->>>>>>> origin/Dev

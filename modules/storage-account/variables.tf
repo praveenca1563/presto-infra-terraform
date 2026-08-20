@@ -71,11 +71,8 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
-<<<<<<< HEAD
 variable "rbac_dependency" {
   description = "Dependency used to ensure storage data-plane RBAC is available before creating blobs."
   type        = any
   default     = null
 }
-=======
->>>>>>> origin/Dev
