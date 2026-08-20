@@ -1,0 +1,63 @@
+resource "azurerm_resource_group_template_deployment" "this" {
+  name                = "${var.data_factory_name}-deployment"
+  resource_group_name = var.resource_group_name
+  deployment_mode     = "Incremental"
+  template_content    = file("${path.module}/adf.json")
+
+  parameters_content = jsonencode({
+    factoryName = {
+      value = var.data_factory_name
+    }
+
+    location = {
+      value = var.location
+    }
+
+    publicNetworkAccess = {
+      value = var.public_network_enabled ? "Enabled" : "Disabled"
+    }
+  })
+}
+data "azurerm_data_factory" "this" {
+  name                = var.data_factory_name
+  resource_group_name = var.resource_group_name
+
+  depends_on = [
+    azurerm_resource_group_template_deployment.this
+  ]
+}
+
+# Grants the ADF System Assigned Managed Identity access to the data lake.
+resource "azurerm_role_assignment" "adf_storage_contributor" {
+  count = 1
+
+  scope                = var.storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_data_factory.this.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "adf_storage_reader" {
+  count = 1
+
+  scope                = var.storage_account_id
+  role_definition_name = "Reader"
+  principal_id         = data.azurerm_data_factory.this.identity[0].principal_id
+}
+
+# RBAC on the ADF instance itself for the data engineering AAD group.
+resource "azurerm_role_assignment" "de_group_contributor" {
+  for_each = toset(var.contributor_group_object_ids)
+
+  scope                = data.azurerm_data_factory.this.id
+  role_definition_name = "Data Factory Contributor"
+  principal_id         = each.value
+}
+
+resource "azurerm_role_assignment" "de_group_reader" {
+  for_each = toset(var.reader_group_object_ids)
+
+  scope                = data.azurerm_data_factory.this.id
+  role_definition_name = "Reader"
+  principal_id         = each.value
+}
+

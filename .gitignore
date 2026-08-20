@@ -1,0 +1,41 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+tfplan
+*.tfplan
+
+# Terraform variable files
+*.tfvars
+*.auto.tfvars
+!*.tfvars.example
+
+# Never commit real secrets
+secrets.auto.tfvars
+*.pem
+*.key
+
+# Terraform lock file
+# Keep this committed so provider versions are reproducible
+# .terraform.lock.hcl
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Terraform binary
+terraform.exe
+
+# Optional local tools
+tools/
+*.zip
+*.log
