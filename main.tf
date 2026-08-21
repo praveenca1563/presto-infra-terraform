@@ -167,6 +167,8 @@ module "databricks" {
 module "github_repo" {
   source = "./modules/github-repo"
 
+  github_owner = var.github_owner
+
   repository_name                 = var.repository_name
   repository_description          = var.repository_description
   visibility                      = var.repository_visibility

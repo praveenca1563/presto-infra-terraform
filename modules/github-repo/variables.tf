@@ -71,4 +71,8 @@ variable "azure_client_secret" {
   default     = null
 }
 
+variable "github_owner" {
+  description = "GitHub organization or user owning the repository"
+  type        = string
+}
 

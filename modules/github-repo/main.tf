@@ -1,6 +1,14 @@
+############################################################
+# Existing GitHub Repository
+############################################################
+
 data "github_repository" "this" {
   full_name = "${var.github_owner}/${var.repository_name}"
 }
+
+############################################################
+# Branch Protection
+############################################################
 
 resource "github_branch_protection" "main" {
   count = var.enable_branch_protection ? 1 : 0
@@ -20,6 +28,10 @@ resource "github_branch_protection" "main" {
 
   enforce_admins = var.enforce_admins_on_protection
 }
+
+############################################################
+# GitHub Actions Secrets
+############################################################
 
 resource "github_actions_secret" "azure_client_id" {
   repository  = data.github_repository.this.name

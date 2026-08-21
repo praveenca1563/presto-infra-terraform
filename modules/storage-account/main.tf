@@ -1,3 +1,7 @@
+############################################################
+# Storage Account
+############################################################
+
 resource "azurerm_storage_account" "this" {
   name                     = var.storage_account_name
   resource_group_name      = var.resource_group_name
@@ -29,6 +33,10 @@ resource "azurerm_storage_account" "this" {
   tags = var.tags
 }
 
+############################################################
+# Storage Containers
+############################################################
+
 resource "azurerm_storage_container" "containers" {
   for_each = toset(var.containers)
 
@@ -36,7 +44,6 @@ resource "azurerm_storage_container" "containers" {
   storage_account_id    = azurerm_storage_account.this.id
   container_access_type = "private"
 }
-
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_role_assignment" "terraform_blob_data_contributor" {
