@@ -9,14 +9,14 @@ resource "azurerm_storage_account" "this" {
 
   is_hns_enabled = true
 
-  min_tls_version           = "TLS1_2"
+  min_tls_version            = "TLS1_2"
   https_traffic_only_enabled = true
 
   public_network_access_enabled = var.public_network_access_enabled
 
   network_rules {
-    default_action = var.network_default_action
-    ip_rules       = var.allowed_ip_ranges
+    default_action             = var.network_default_action
+    ip_rules                   = var.allowed_ip_ranges
     virtual_network_subnet_ids = var.allowed_subnet_ids
   }
 
