@@ -1,5 +1,5 @@
 resource "azurerm_resource_group_template_deployment" "this" {
-  name                = "${var.data_factory_name}-deployment"
+  name                = "${var.data_factory_name}-deployment-v2"
   resource_group_name = var.resource_group_name
   deployment_mode     = "Incremental"
   template_content    = file("${path.module}/adf.json")
